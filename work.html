@@ -1,12 +1,13 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" data-root="">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Work | Otamo Tipa</title>
+<title>Otamo Tipa</title>
 <meta name="description" content="Video and photography by Otamo Tipa: showreel, short form and photography.">
 <link rel="icon" type="image/jpeg" href="images/alasalimatcutplace_3.1.1.jpg">
 <link rel="stylesheet" href="style.css">
+<script src="site.js?v=4" defer></script>
 </head>
 <body>
 
@@ -31,23 +32,20 @@
 
   <!-- SHORT FORM -->
   <div class="label" id="short">Short form</div>
-  <!-- STEP 2: Put compressed MP4s (under about 10 MB) in a "clips" folder, then replace each placeholder with:
-       <div class="embed r9"><video src="clips/clip1.mp4" poster="clips/clip1.jpg" controls muted playsinline preload="none"></video></div>
-       For a looping clip with no controls use: autoplay muted loop playsinline -->
+  <!-- Upload short clips to the "clips" folder named short-form-1.mp4 to short-form-5.mp4 (under about 10 MB each). They appear here by themselves. -->
   <div class="row">
-    <div class="ph r9">Clip 1</div>
-    <div class="ph r9">Clip 2</div>
-    <div class="ph r9">Clip 3</div>
-    <div class="ph r9">Clip 4</div>
-    <div class="ph r9">Clip 5</div>
+    <div class="ph r9" data-video="short-form-1">short-form-1</div>
+    <div class="ph r9" data-video="short-form-2">short-form-2</div>
+    <div class="ph r9" data-video="short-form-3">short-form-3</div>
+    <div class="ph r9" data-video="short-form-4">short-form-4</div>
+    <div class="ph r9" data-video="short-form-5">short-form-5</div>
   </div>
 
   <!-- PHOTOGRAPHY: one big image that links to the photo page -->
   <div class="label">Photography</div>
-  <!-- Put your cover photo in "images" and replace the placeholder with:
-       <img src="images/photo-cover.jpg" alt="Photography by Otamo Tipa"> -->
+  <!-- Upload a file named photography.jpg (or .jpeg, .png, .webp) to the "images" folder. It appears here by itself. -->
   <a class="full" href="work/photo.html" aria-label="See the photography">
-    <div class="ph">Photography cover image</div>
+    <div class="ph" data-slot="photography">photography</div>
     <div class="cap">Photography</div>
     <span class="go">View</span>
   </a>
