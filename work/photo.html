@@ -22,24 +22,48 @@
 
 <main>
 
-  <!-- EVENT (top). Room for many images: copy or delete lines as you like. -->
+  <!-- EVENT (top): four events. Each one is a wide photo (3 tiles wide, 1 tile tall) with 3 photos under it. -->
   <div class="label" id="event" style="padding-top:5rem">Event</div>
-  <!-- Photos go in the "images" folder. Replace each placeholder with:
-       <img src="../images/event1.jpg" alt="Describe the photo" loading="lazy">
-       Note the "../" at the start of the path on this page. -->
-  <div class="photos">
-    <div class="ph r45">Event 1</div>
-    <div class="ph r45">Event 2</div>
-    <div class="ph r45">Event 3</div>
-    <div class="ph r45">Event 4</div>
-    <div class="ph r45">Event 5</div>
-    <div class="ph r45">Event 6</div>
-    <div class="ph r45">Event 7</div>
-    <div class="ph r45">Event 8</div>
-    <div class="ph r45">Event 9</div>
-    <div class="ph r45">Event 10</div>
-    <div class="ph r45">Event 11</div>
-    <div class="ph r45">Event 12</div>
+  <!-- Replace each placeholder with an image, for example:
+       <img class="wide" src="../images/event1-wide.jpg" alt="Describe the photo" loading="lazy">
+       <img src="../images/event1-a.jpg" alt="Describe the photo" loading="lazy">
+       The wide photo needs class="wide". The small ones need nothing extra.
+       Change the text under each block ("Event 1 name") to the real event name. -->
+  <div class="event">
+    <div class="photos ev">
+      <div class="ph wide">Event 1: wide photo</div>
+      <div class="ph r45">Event 1: photo 1</div>
+      <div class="ph r45">Event 1: photo 2</div>
+      <div class="ph r45">Event 1: photo 3</div>
+    </div>
+    <div class="cap">Event 1 name</div>
+  </div>
+  <div class="event">
+    <div class="photos ev">
+      <div class="ph wide">Event 2: wide photo</div>
+      <div class="ph r45">Event 2: photo 1</div>
+      <div class="ph r45">Event 2: photo 2</div>
+      <div class="ph r45">Event 2: photo 3</div>
+    </div>
+    <div class="cap">Event 2 name</div>
+  </div>
+  <div class="event">
+    <div class="photos ev">
+      <div class="ph wide">Event 3: wide photo</div>
+      <div class="ph r45">Event 3: photo 1</div>
+      <div class="ph r45">Event 3: photo 2</div>
+      <div class="ph r45">Event 3: photo 3</div>
+    </div>
+    <div class="cap">Event 3 name</div>
+  </div>
+  <div class="event">
+    <div class="photos ev">
+      <div class="ph wide">Event 4: wide photo</div>
+      <div class="ph r45">Event 4: photo 1</div>
+      <div class="ph r45">Event 4: photo 2</div>
+      <div class="ph r45">Event 4: photo 3</div>
+    </div>
+    <div class="cap">Event 4 name</div>
   </div>
 
   <!-- PORTRAIT -->
