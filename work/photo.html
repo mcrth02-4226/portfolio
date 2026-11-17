@@ -1,18 +1,19 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" data-root="../">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Photo | Otamo Tipa</title>
+<title>Otamo Tipa</title>
 <meta name="description" content="Event, portrait and aerial photography by Otamo Tipa.">
 <link rel="icon" type="image/jpeg" href="../images/alasalimatcutplace_3.1.1.jpg">
-<link rel="stylesheet" href="../style.css?v=3">
+<link rel="stylesheet" href="../style.css?v=4">
 <style>
 /* Event layout, kept here too so it works even if style.css is cached */
 .photos.ev{grid-template-columns:repeat(3,1fr)}
 .photos .wide{grid-column:1/-1;aspect-ratio:12/5;width:100%;object-fit:cover}
 .event{margin-bottom:2.5rem}
 </style>
+<script src="../site.js?v=4" defer></script>
 </head>
 <body>
 
@@ -28,75 +29,71 @@
 
 <main>
 
-  <!-- EVENT (top): four events. Each one is a wide photo (3 tiles wide, 1 tile tall) with 3 photos under it. -->
-  <div class="label" id="event" style="padding-top:5rem">Event</div>
-  <!-- Replace each placeholder with an image, for example:
-       <img class="wide" src="../images/event1-wide.jpg" alt="Describe the photo" loading="lazy">
-       <img src="../images/event1-a.jpg" alt="Describe the photo" loading="lazy">
-       The wide photo needs class="wide". The small ones need nothing extra.
+  <!-- EVENT: four events. Each has a wide photo and 3 photos under it.
+       Upload files to the "images" folder named exactly as shown in each box,
+       for example event-2-wide.jpg or event-4-photo-2.jpg. They appear by themselves.
        Change the text under each block ("Event 1 name") to the real event name. -->
+  <div class="label" id="event" style="padding-top:5rem">Event</div>
   <div class="event">
     <div class="photos ev">
-      <div class="ph wide">Event 1: wide photo</div>
-      <div class="ph r45">Event 1: photo 1</div>
-      <div class="ph r45">Event 1: photo 2</div>
-      <div class="ph r45">Event 1: photo 3</div>
+      <div class="ph wide" data-slot="event-1-wide">event-1-wide</div>
+      <div class="ph r45" data-slot="event-1-photo-1">event-1-photo-1</div>
+      <div class="ph r45" data-slot="event-1-photo-2">event-1-photo-2</div>
+      <div class="ph r45" data-slot="event-1-photo-3">event-1-photo-3</div>
     </div>
     <div class="cap">Event 1 name</div>
   </div>
   <div class="event">
     <div class="photos ev">
-      <div class="ph wide">Event 2: wide photo</div>
-      <div class="ph r45">Event 2: photo 1</div>
-      <div class="ph r45">Event 2: photo 2</div>
-      <div class="ph r45">Event 2: photo 3</div>
+      <div class="ph wide" data-slot="event-2-wide">event-2-wide</div>
+      <div class="ph r45" data-slot="event-2-photo-1">event-2-photo-1</div>
+      <div class="ph r45" data-slot="event-2-photo-2">event-2-photo-2</div>
+      <div class="ph r45" data-slot="event-2-photo-3">event-2-photo-3</div>
     </div>
     <div class="cap">Event 2 name</div>
   </div>
   <div class="event">
     <div class="photos ev">
-      <div class="ph wide">Event 3: wide photo</div>
-      <div class="ph r45">Event 3: photo 1</div>
-      <div class="ph r45">Event 3: photo 2</div>
-      <div class="ph r45">Event 3: photo 3</div>
+      <div class="ph wide" data-slot="event-3-wide">event-3-wide</div>
+      <div class="ph r45" data-slot="event-3-photo-1">event-3-photo-1</div>
+      <div class="ph r45" data-slot="event-3-photo-2">event-3-photo-2</div>
+      <div class="ph r45" data-slot="event-3-photo-3">event-3-photo-3</div>
     </div>
     <div class="cap">Event 3 name</div>
   </div>
   <div class="event">
     <div class="photos ev">
-      <div class="ph wide">Event 4: wide photo</div>
-      <div class="ph r45">Event 4: photo 1</div>
-      <div class="ph r45">Event 4: photo 2</div>
-      <div class="ph r45">Event 4: photo 3</div>
+      <div class="ph wide" data-slot="event-4-wide">event-4-wide</div>
+      <div class="ph r45" data-slot="event-4-photo-1">event-4-photo-1</div>
+      <div class="ph r45" data-slot="event-4-photo-2">event-4-photo-2</div>
+      <div class="ph r45" data-slot="event-4-photo-3">event-4-photo-3</div>
     </div>
     <div class="cap">Event 4 name</div>
   </div>
 
-  <!-- PORTRAIT -->
+  <!-- PORTRAIT: portrait-1 to portrait-6 -->
   <div class="label" id="portrait">Portrait</div>
-  <!-- e.g. <img src="../images/portrait1.jpg" alt="Describe the photo" loading="lazy"> -->
   <div class="photos">
-    <div class="ph r45">Portrait 1</div>
-    <div class="ph r45">Portrait 2</div>
-    <div class="ph r45">Portrait 3</div>
-    <div class="ph r45">Portrait 4</div>
-    <div class="ph r45">Portrait 5</div>
-    <div class="ph r45">Portrait 6</div>
+      <div class="ph r45" data-slot="portrait-1">portrait-1</div>
+      <div class="ph r45" data-slot="portrait-2">portrait-2</div>
+      <div class="ph r45" data-slot="portrait-3">portrait-3</div>
+      <div class="ph r45" data-slot="portrait-4">portrait-4</div>
+      <div class="ph r45" data-slot="portrait-5">portrait-5</div>
+      <div class="ph r45" data-slot="portrait-6">portrait-6</div>
   </div>
 
-  <!-- AERIAL (drone): the 360 first, then six photos -->
+  <!-- AERIAL: the 360 first, then aerial-1 to aerial-6 -->
   <div class="label" id="aerial">Aerial</div>
   <div class="embed r360">
     <script src="https://static.kuula.io/embed.js" data-kuula="https://kuula.co/share/LnHZp?logo=1&info=1&fs=1&vr=0&autorotate=-0.43&thumbs=1" data-width="100%" data-height="640px"></script>
   </div>
-  <!-- e.g. <img src="../images/aerial1.jpg" alt="Describe the photo" loading="lazy"> -->
   <div class="photos" style="margin-top:2px">
-    <div class="ph r45">Aerial 1</div>
-    <div class="ph r45">Aerial 2</div>
-    <div class="ph r45">Aerial 3</div>
-    <div class="ph r45">Aerial 4</div>
-    <div class="ph r45">Aerial 5</div>
-    <div class="ph r45">Aerial 6</div>
+      <div class="ph r45" data-slot="aerial-1">aerial-1</div>
+      <div class="ph r45" data-slot="aerial-2">aerial-2</div>
+      <div class="ph r45" data-slot="aerial-3">aerial-3</div>
+      <div class="ph r45" data-slot="aerial-4">aerial-4</div>
+      <div class="ph r45" data-slot="aerial-5">aerial-5</div>
+      <div class="ph r45" data-slot="aerial-6">aerial-6</div>
   </div>
 </main>
 
