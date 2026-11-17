@@ -69,7 +69,7 @@
       v.onloadedmetadata = function () {
         lastVid = ext;
         var box = document.createElement('div');
-        box.className = 'embed r9';
+        box.className = 'embed ' + (el.getAttribute('data-ratio') || 'r43');
         box.appendChild(v);
         el.replaceWith(box);
         finish();

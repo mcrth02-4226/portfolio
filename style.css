@@ -62,3 +62,15 @@ footer div{display:flex;gap:1.25rem;flex-wrap:wrap}
 /* Placeholders show their file name; media swapped in by site.js */
 .ph{overflow-wrap:anywhere}
 .embed video{object-fit:cover}
+
+/* Short form: vertical 3:4 clips, four across on wide screens, swipeable row on phones */
+.r34{aspect-ratio:3/4}
+@media(min-width:900px){
+  .row{display:grid;grid-template-columns:repeat(4,1fr);gap:6px;overflow:visible;scroll-snap-type:none}
+  .row>*{flex:none}
+}
+
+/* Short form: four horizontal 4:3 clips */
+.r43{aspect-ratio:4/3}
+.clips43{display:grid;grid-template-columns:repeat(4,1fr);gap:2px}
+@media(max-width:700px){.clips43{grid-template-columns:repeat(2,1fr)}}
