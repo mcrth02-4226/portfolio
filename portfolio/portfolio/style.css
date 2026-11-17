@@ -1,0 +1,43 @@
+:root{--night:#0b0b0c;--panel:#161617;--edge:#2a2a2c;--text:#ededee;--muted:#8d8d92;--pad:1.25rem}
+*{box-sizing:border-box;margin:0}
+html{scroll-behavior:smooth}
+body{font-family:"Helvetica Neue",Helvetica,Arial,sans-serif;background:var(--night);color:var(--text);font-size:.82rem;line-height:1.5;-webkit-font-smoothing:antialiased}
+a{color:inherit;text-decoration:none}
+a:hover{color:var(--muted)}
+:focus-visible{outline:2px solid var(--text);outline-offset:3px}
+
+header{position:fixed;top:0;left:0;right:0;z-index:10;display:flex;justify-content:space-between;align-items:center;gap:1rem;padding:var(--pad);background:linear-gradient(180deg,rgba(0,0,0,.6),transparent)}
+header nav{display:flex;gap:1.25rem}
+
+.ph{display:flex;align-items:center;justify-content:center;text-align:center;background:var(--panel);color:var(--muted);width:100%;padding:1rem}
+.embed{background:#000}
+.embed iframe,.embed video{width:100%;height:100%;border:0;display:block}
+img{max-width:100%}
+.r16{aspect-ratio:16/9}
+.r9{aspect-ratio:9/16}
+.r45{aspect-ratio:4/5}
+
+.full{position:relative;display:block;height:100svh;min-height:420px}
+.full>.ph,.full>img{height:100%;width:100%;object-fit:cover;display:block}
+.full .cap{position:absolute;left:var(--pad);bottom:var(--pad);margin:0;padding:0}
+.full .go{position:absolute;right:var(--pad);bottom:var(--pad)}
+
+.hero{position:relative}
+.hero .r16{max-height:100svh;min-height:60svh}
+.hero .cap{position:absolute;left:var(--pad);bottom:var(--pad);pointer-events:none;padding:0;margin:0}
+
+.label{padding:3rem var(--pad) .9rem;color:var(--muted)}
+.cap{margin-top:.5rem;padding:0 var(--pad)}
+.stack{display:grid;gap:2.5rem}
+
+.row{display:flex;gap:6px;overflow-x:auto;padding:0 var(--pad) 1rem;scroll-snap-type:x mandatory}
+.row>*{flex:0 0 min(62vw,240px);scroll-snap-align:start}
+
+.photos{display:grid;grid-template-columns:repeat(3,1fr);gap:2px}
+.photos img{width:100%;aspect-ratio:4/5;object-fit:cover;display:block}
+@media(max-width:560px){.photos{grid-template-columns:repeat(2,1fr)}}
+
+.small{padding:0 var(--pad);max-width:46ch;color:var(--muted)}
+footer{display:flex;justify-content:space-between;flex-wrap:wrap;gap:1rem;padding:3rem var(--pad) var(--pad);color:var(--muted)}
+footer div{display:flex;gap:1.25rem;flex-wrap:wrap}
+@media(prefers-reduced-motion:reduce){html{scroll-behavior:auto}}
