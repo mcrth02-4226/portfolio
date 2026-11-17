@@ -41,3 +41,15 @@ img{max-width:100%}
 footer{display:flex;justify-content:space-between;flex-wrap:wrap;gap:1rem;padding:3rem var(--pad) var(--pad);color:var(--muted)}
 footer div{display:flex;gap:1.25rem;flex-wrap:wrap}
 @media(prefers-reduced-motion:reduce){html{scroll-behavior:auto}}
+
+/* 360 embed */
+.r360{height:70svh;min-height:360px}
+.embed.r360{width:100%}
+
+/* About with a photo on the right edge */
+.about{display:grid;grid-template-columns:1fr minmax(150px,36%);gap:var(--pad);align-items:start;padding:0 0 4rem var(--pad)}
+.about .small{padding:0;max-width:48ch;font-size:1rem;line-height:1.6}
+.me img{width:100%;aspect-ratio:4/5;object-fit:cover;display:block}
+.label.big{padding-top:5rem}
+
+.r360 iframe,.r360 .ku-embed{width:100%!important;height:100%!important;border:0}
