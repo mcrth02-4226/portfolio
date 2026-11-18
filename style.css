@@ -74,3 +74,44 @@ footer div{display:flex;gap:1.25rem;flex-wrap:wrap}
 .r43{aspect-ratio:4/3}
 .clips43{display:grid;grid-template-columns:repeat(4,1fr);gap:2px}
 @media(max-width:700px){.clips43{grid-template-columns:repeat(2,1fr)}}
+
+/* ---------- Loading: a camera "focusing" animation ---------- */
+.ph,.clip{position:relative}
+.ph{overflow:hidden}
+.ph.is-loading{color:transparent}              /* hides the file name once we know the file exists */
+.is-loading{overflow:hidden}
+.is-loading::before{content:"";position:absolute;inset:0;pointer-events:none;
+  background:linear-gradient(110deg,transparent 30%,rgba(255,255,255,.09) 50%,transparent 70%);
+  transform:translateX(-100%);animation:sweep 1.8s ease-in-out infinite}
+.is-loading::after{content:"";position:absolute;inset:14px;pointer-events:none;
+  background:
+    linear-gradient(#fff,#fff) 0 0/20px 2px no-repeat,    linear-gradient(#fff,#fff) 0 0/2px 20px no-repeat,
+    linear-gradient(#fff,#fff) 100% 0/20px 2px no-repeat, linear-gradient(#fff,#fff) 100% 0/2px 20px no-repeat,
+    linear-gradient(#fff,#fff) 0 100%/20px 2px no-repeat, linear-gradient(#fff,#fff) 0 100%/2px 20px no-repeat,
+    linear-gradient(#fff,#fff) 100% 100%/20px 2px no-repeat, linear-gradient(#fff,#fff) 100% 100%/2px 20px no-repeat;
+  animation:focus 1.8s ease-in-out infinite}
+@keyframes sweep{to{transform:translateX(100%)}}
+@keyframes focus{0%,100%{inset:12px;opacity:.3}50%{inset:30px;opacity:.95}}
+
+/* Photos fade and sharpen in when ready */
+img.reveal{opacity:0;filter:blur(14px);transition:opacity .8s ease,filter 1s ease}
+img.reveal.in{opacity:1;filter:none}
+
+/* ---------- Short-form clip cards: thumbnail, play button, video loads on click ---------- */
+.clip{display:block;width:100%;background:#000;cursor:pointer;overflow:hidden}
+.clip>img,.clip>video{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;display:block;background:#000}
+.clip.is-loading>img{filter:brightness(.55)}
+.clip.is-loading>video{opacity:0}
+.clip.playing{cursor:default}
+.play{position:absolute;left:50%;top:50%;width:54px;height:54px;margin:-27px 0 0 -27px;border-radius:50%;
+  background:rgba(0,0,0,.45);border:1.5px solid rgba(255,255,255,.85);transition:transform .2s ease,opacity .2s ease}
+.play::after{content:"";position:absolute;left:21px;top:16px;border-left:15px solid #fff;border-top:10px solid transparent;border-bottom:10px solid transparent}
+.clip:hover .play,.clip:focus-visible .play{transform:scale(1.1)}
+.clip.is-loading .play{opacity:0}
+.msg{position:absolute;left:0;right:0;bottom:.8rem;text-align:center;color:var(--text);z-index:2}
+
+@media(prefers-reduced-motion:reduce){
+  .is-loading::before{animation:none;opacity:0}
+  .is-loading::after{animation:none;opacity:.6}
+  img.reveal{transition:none;filter:none}
+}

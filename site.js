@@ -1,23 +1,30 @@
-/* Otamo Tipa: automatic media linking.
-   Every placeholder has a name (for example event-1-photo-2).
-   If a file with that name exists in the images folder (or the clips folder for videos),
-   this script swaps the placeholder for it. Upload the file and it appears.
-   Media only loads as you scroll near it, a few at a time, so pages open fast. */
+/* Otamo Tipa: automatic media linking, loading effect and clip thumbnails.
+   (Analytics lives in analytics.js.)
+
+   FILE NAMES
+   - Every empty box on the pages shows the exact file name it is waiting for.
+   - Upload a file with that name to the "images" folder (.jpg, .jpeg, .png or .webp) and it appears by itself.
+   - Short-form clips: thumbnails are images named short-form-1-thumbnail (images folder);
+     the videos are short-form-1.mp4 (clips folder). The video loads only when someone clicks the thumbnail.
+   - Tab icon: images/favicon.png (or .ico, .jpg, .svg).
+   Media loads only as you scroll near it, a few files at a time. */
 (function () {
+  var MAX_AT_ONCE = 3;             // files loading at the same time
+  var LOOK_AHEAD = '350px 150px';  // start loading this far before something scrolls into view
+
   var root = document.documentElement.getAttribute('data-root') || '';
   var IMG = ['jpg', 'jpeg', 'png', 'webp', 'JPG', 'JPEG', 'PNG', 'WEBP'];
   var VID = ['mp4', 'MP4', 'webm', 'mov', 'MOV'];
   var ICO = ['png', 'ico', 'jpg', 'jpeg', 'webp', 'svg'];
-  var MAX_AT_ONCE = 3;     // how many files load at the same time
-  var LOOK_AHEAD = '350px 150px'; // start loading this far before something scrolls into view
   var lastImg = null, lastVid = null; // remember which extension worked, try it first next time
 
+  function track(name, data) { if (window.track) window.track(name, data); }
   function order(list, first) {
     return first ? [first].concat(list.filter(function (e) { return e !== first; })) : list;
   }
   function extOf(url) { return url.split('#')[0].split('.').pop(); }
 
-  // Simple queue: only a few things download at once
+  // Only a few downloads at once
   var active = 0, queue = [];
   function enqueue(job) { queue.push(job); pump(); }
   function pump() {
@@ -27,76 +34,157 @@
     }
   }
 
-  function tryImage(name, exts, done) {
+  // Does this file exist? A tiny HEAD request (no download). Falls back to loading the file
+  // when HEAD isn't possible, for example when the site is opened from a local folder.
+  var headOK = true;
+  function exists(url, kind, cb) {
+    function viaElement() {
+      if (kind === 'image') {
+        var im = new Image();
+        im.onload = function () { cb(true); };
+        im.onerror = function () { cb(false); };
+        im.src = url;
+      } else {
+        var v = document.createElement('video');
+        v.preload = 'metadata';
+        v.onloadedmetadata = function () { cb(true); };
+        v.onerror = function () { cb(false); };
+        v.src = url;
+      }
+    }
+    if (!headOK || !window.fetch) { viaElement(); return; }
+    fetch(url, { method: 'HEAD' }).then(function (r) {
+      cb(r.ok && (r.headers.get('content-type') || '').indexOf(kind) === 0);
+    }).catch(function () { headOK = false; viaElement(); });
+  }
+  function find(folder, name, exts, kind, cb) {
     var i = 0;
     (function next() {
-      if (i >= exts.length) { done(null); return; }
-      var url = root + 'images/' + name + '.' + exts[i++];
-      var im = new Image();
-      im.onload = function () { done(url); };
-      im.onerror = next;
-      im.src = url;
+      if (i >= exts.length) { cb(null); return; }
+      var url = root + folder + '/' + name + '.' + exts[i++];
+      exists(url, kind, function (ok) { if (ok) cb(url); else next(); });
     })();
   }
 
+  /* ---------- photos ---------- */
   function fillImage(el, finish) {
     var name = el.getAttribute('data-slot');
-    tryImage(name, order(IMG, lastImg), function (url) {
-      if (url) {
-        lastImg = extOf(url);
+    find('images', name, order(IMG, lastImg), 'image', function (url) {
+      if (!url) { finish(); return; }            // not uploaded yet: the file name stays visible
+      lastImg = extOf(url);
+      el.classList.add('is-loading');            // the file exists: show the focusing animation
+      var im = new Image();
+      im.onload = function () {
         var img = document.createElement('img');
         img.src = url;
         img.alt = name.replace(/-/g, ' ') + ' by Otamo Tipa';
-        img.className = el.className.replace(/\bph\b/, '').trim();
+        img.className = (el.className.replace(/\bph\b/, '').replace(/\bis-loading\b/, '') + ' reveal').trim();
         img.decoding = 'async';
         el.replaceWith(img);
-      }
-      finish();
+        requestAnimationFrame(function () { requestAnimationFrame(function () { img.classList.add('in'); }); });
+        finish();
+      };
+      im.onerror = function () { el.classList.remove('is-loading'); finish(); };
+      im.src = url;
     });
   }
 
-  function fillVideo(el, finish) {
-    var name = el.getAttribute('data-video');
-    var exts = order(VID, lastVid), i = 0;
-    (function next() {
-      if (i >= exts.length) { finish(); return; }
-      var ext = exts[i++];
-      var v = document.createElement('video');
-      v.muted = true;
-      v.controls = true;
-      v.setAttribute('playsinline', '');
-      v.preload = 'metadata';          // only fetch the first frame until someone presses play
-      v.onloadedmetadata = function () {
-        lastVid = ext;
-        var box = document.createElement('div');
-        box.className = 'embed ' + (el.getAttribute('data-ratio') || 'r43');
-        box.appendChild(v);
-        el.replaceWith(box);
+  /* ---------- short-form clips: thumbnail first, the video loads on click ---------- */
+  function fillClip(el, finish) {
+    var name = el.getAttribute('data-clip');
+    var ratio = el.getAttribute('data-ratio') || 'r43';
+    find('images', name + '-thumbnail', order(IMG, lastImg), 'image', function (thumb) {
+      if (!thumb) { finish(); return; }
+      lastImg = extOf(thumb);
+      el.classList.add('is-loading');
+      var im = new Image();
+      im.onload = function () {
+        var clip = document.createElement('div');
+        clip.className = 'clip ' + ratio;
+        clip.setAttribute('role', 'button');
+        clip.setAttribute('tabindex', '0');
+        clip.setAttribute('aria-label', 'Play ' + name.replace(/-/g, ' '));
+        var img = document.createElement('img');
+        img.alt = '';
+        img.src = thumb;
+        img.className = 'reveal';
+        var play = document.createElement('span');
+        play.className = 'play';
+        clip.appendChild(img);
+        clip.appendChild(play);
+        function go() { playClip(clip, name, thumb); }
+        clip.addEventListener('click', go);
+        clip.addEventListener('keydown', function (e) {
+          if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); go(); }
+        });
+        el.replaceWith(clip);
+        requestAnimationFrame(function () { requestAnimationFrame(function () { img.classList.add('in'); }); });
         finish();
       };
-      v.onerror = next;
-      v.src = root + 'clips/' + name + '.' + ext + '#t=0.1';
-    })();
+      im.onerror = function () { el.classList.remove('is-loading'); finish(); };
+      im.src = thumb;
+    });
+  }
+
+  function playClip(clip, name, thumb) {
+    if (clip.classList.contains('is-loading') || clip.classList.contains('playing')) return;
+    clip.classList.add('is-loading');
+    track('clip_play', { clip: name });
+    find('clips', name, order(VID, lastVid), 'video', function (url) {
+      if (!url) {
+        clip.classList.remove('is-loading');
+        var msg = document.createElement('span');
+        msg.className = 'msg';
+        msg.textContent = 'Video coming soon';
+        clip.appendChild(msg);
+        return;
+      }
+      lastVid = extOf(url);
+      var v = document.createElement('video');
+      v.setAttribute('playsinline', '');
+      v.preload = 'auto';
+      v.poster = thumb;
+      v.addEventListener('canplay', function () {
+        clip.classList.remove('is-loading');
+        clip.classList.add('playing');
+        v.controls = true;
+        var play = clip.querySelector('.play');
+        if (play) play.remove();
+        var p = v.play();
+        if (p && p.catch) p.catch(function () {});
+      }, { once: true });
+      v.onerror = function () {
+        v.remove();
+        clip.classList.remove('is-loading');
+        var msg = document.createElement('span');
+        msg.className = 'msg';
+        msg.textContent = 'This video could not be loaded';
+        clip.appendChild(msg);
+      };
+      v.src = url;
+      clip.appendChild(v);                       // video sits on top, hidden until it can play
+    });
   }
 
   function run(el) {
     enqueue(function (finish) {
-      if (el.hasAttribute('data-video')) fillVideo(el, finish); else fillImage(el, finish);
+      if (el.hasAttribute('data-clip')) fillClip(el, finish); else fillImage(el, finish);
     });
   }
 
-  // Tab icon: use images/favicon.(png, ico, jpg, jpeg, webp or svg) if it exists
+  /* ---------- tab icon ---------- */
   var link = document.querySelector('link[rel~="icon"]');
   if (link) {
     enqueue(function (finish) {
-      tryImage('favicon', ICO, function (url) {
+      find('images', 'favicon', ICO, 'image', function (url) {
         if (url) { link.removeAttribute('type'); link.href = url; }
         finish();
       });
     });
   }
 
-  var els = document.querySelectorAll('[data-slot],[data-video]');
+  /* ---------- start: only things near the screen load ---------- */
+  var els = document.querySelectorAll('[data-slot],[data-clip]');
   if ('IntersectionObserver' in window) {
     var io = new IntersectionObserver(function (entries) {
       entries.forEach(function (e) {

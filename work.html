@@ -6,8 +6,9 @@
 <title>Otamo Tipa</title>
 <meta name="description" content="Video and photography by Otamo Tipa: showreel, short form and photography.">
 <link rel="icon" type="image/jpeg" href="images/alasalimatcutplace_3.1.1.jpg">
-<link rel="stylesheet" href="style.css">
-<script src="site.js?v=4" defer></script>
+<link rel="stylesheet" href="style.css?v=6">
+<script src="site.js?v=6" defer></script>
+<script src="analytics.js?v=6" defer></script>
 </head>
 <body>
 
@@ -32,13 +33,15 @@
 
   <!-- SHORT FORM -->
   <div class="label" id="short">Short form</div>
-  <!-- Upload 4 short clips (horizontal 4:3, MP4, under about 10 MB each) to the "clips" folder named
-       short-form-1.mp4 to short-form-4.mp4. They appear here by themselves. -->
+  <!-- Short form: each box waits for a thumbnail image named short-form-1-thumbnail
+       (images folder, .jpg/.jpeg/.png/.webp, horizontal 4:3). Visitors see the thumbnail; when they click it,
+       the video (clips folder, named short-form-1.mp4) loads and plays. Same for 2, 3 and 4.
+       Keep each MP4 under about 10 MB. -->
   <div class="clips43">
-    <div class="ph r43" data-video="short-form-1" data-ratio="r43">short-form-1</div>
-    <div class="ph r43" data-video="short-form-2" data-ratio="r43">short-form-2</div>
-    <div class="ph r43" data-video="short-form-3" data-ratio="r43">short-form-3</div>
-    <div class="ph r43" data-video="short-form-4" data-ratio="r43">short-form-4</div>
+    <div class="ph r43" data-clip="short-form-1" data-ratio="r43">short-form-1-thumbnail</div>
+    <div class="ph r43" data-clip="short-form-2" data-ratio="r43">short-form-2-thumbnail</div>
+    <div class="ph r43" data-clip="short-form-3" data-ratio="r43">short-form-3-thumbnail</div>
+    <div class="ph r43" data-clip="short-form-4" data-ratio="r43">short-form-4-thumbnail</div>
   </div>
 
   <!-- PHOTOGRAPHY: one big image that links to the photo page -->
