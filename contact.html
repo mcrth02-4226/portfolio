@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="en" data-root="">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Otamo Tipa</title>
+<meta name="description" content="Contact Otamo Tipa, videographer and photographer.">
+<link rel="icon" type="image/jpeg" href="images/alasalimatcutplace_3.1.1.jpg">
+<link rel="stylesheet" href="style.css?v=5">
+<style>
+body{background:#000}
+main{min-height:100svh;display:grid;place-items:center;padding:6rem var(--pad)}
+
+/* The contact box: white with black text. On hover or keyboard focus it turns black with white text
+   and shows the email address. A click opens the visitor's email app. */
+.contact-box{display:inline-grid;place-items:center;min-width:min(88vw,22rem);padding:1.5rem 2.5rem;
+  background:#fff;color:#000;border:1px solid #fff;font-size:1.05rem;font-weight:600;letter-spacing:.01em;
+  transition:background .25s ease,color .25s ease}
+.contact-box>span{grid-area:1/1;transition:opacity .25s ease}
+.contact-box .email{opacity:0}
+.contact-box:hover,.contact-box:focus-visible{background:#000;color:#fff}
+.contact-box:hover .label,.contact-box:focus-visible .label{opacity:0}
+.contact-box:hover .email,.contact-box:focus-visible .email{opacity:1}
+
+/* Touch screens have no hover, so show the address under the box instead */
+.below{display:none;margin-top:1rem;color:var(--muted);text-align:center}
+@media(hover:none){.below{display:block}}
+.stack-c{display:flex;flex-direction:column;align-items:center}
+</style>
+<script src="site.js?v=5" defer></script>
+<script src="analytics.js?v=5" defer></script>
+</head>
+<body>
+
+<header>
+  <a href="index.html">Otamo Tipa</a>
+  <nav aria-label="Main">
+    <a href="work.html">Work</a>
+  </nav>
+</header>
+
+<main>
+  <div class="stack-c">
+    <a class="contact-box" href="mailto:otamitto.media@gmail.com" aria-label="Email Otamo Tipa at otamitto.media@gmail.com">
+      <span class="label">Contact me</span>
+      <span class="email">otamitto.media@gmail.com</span>
+    </a>
+    <p class="below">otamitto.media@gmail.com</p>
+  </div>
+</main>
+
+</body>
+</html>
