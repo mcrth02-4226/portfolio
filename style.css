@@ -115,3 +115,9 @@ img.reveal.in{opacity:1;filter:none}
   .is-loading::after{animation:none;opacity:.6}
   img.reveal{transition:none;filter:none}
 }
+
+/* Contact button in every header; header links wrap instead of overflowing on small screens */
+header{align-items:flex-start}
+header nav{flex-wrap:wrap;justify-content:flex-end;gap:.35rem 1.1rem}
+.nav-contact{border:1px solid rgba(255,255,255,.55);border-radius:999px;padding:0 .85rem;transition:background .2s ease,color .2s ease}
+.nav-contact:hover,.nav-contact:focus-visible{background:#fff;color:#000}
