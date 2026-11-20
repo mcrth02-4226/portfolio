@@ -211,4 +211,31 @@
   } else {
     Array.prototype.forEach.call(els, run);
   }
+  /* ---------- section menu: the link for the section you are in stays bright, the others dim ---------- */
+  (function () {
+    var links = document.querySelectorAll('nav.sections a[href^="#"]');
+    var items = [];
+    Array.prototype.forEach.call(links, function (a) {
+      var t = document.getElementById(a.getAttribute('href').slice(1));
+      if (t) items.push({ a: a, t: t });
+    });
+    if (!items.length) return;
+    var ticking = false, current = null;
+    function update() {
+      ticking = false;
+      var line = window.innerHeight * 0.4, pick = items[0];
+      items.forEach(function (it) { if (it.t.getBoundingClientRect().top <= line) pick = it; });
+      if (pick === current) return;
+      current = pick;
+      items.forEach(function (it) {
+        var on = it === pick;
+        it.a.classList.toggle('is-current', on);
+        if (on) it.a.setAttribute('aria-current', 'location'); else it.a.removeAttribute('aria-current');
+      });
+    }
+    function onScroll() { if (!ticking) { ticking = true; requestAnimationFrame(update); } }
+    window.addEventListener('scroll', onScroll, { passive: true });
+    window.addEventListener('resize', onScroll);
+    update();
+  })();
 })();

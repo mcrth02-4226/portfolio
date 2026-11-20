@@ -161,3 +161,12 @@ footer.pagefoot{display:block;padding:3rem var(--pad) var(--pad)}
 .info a{position:relative}
 .info a::before{content:"";position:absolute;inset:-9px -6px}
 @media(max-width:480px){.pill{padding:.5rem .7rem;font-size:.95rem}}
+
+/* ================= Section menu: centred on the right edge, current section stays bright ================= */
+.hnav nav.sections a{opacity:.6;padding-right:.75rem;border-right:2px solid transparent;
+  transition:opacity .3s ease,border-color .3s ease}
+.hnav nav.sections a.is-current{opacity:1;border-right-color:#fff}
+@media(min-width:700px){
+  .hnav nav.sections{position:fixed;right:var(--pad);top:50%;transform:translateY(-50%);gap:.8rem}
+}
+@media(prefers-reduced-motion:reduce){.hnav nav.sections a{transition:none}}
