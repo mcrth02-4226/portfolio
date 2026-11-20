@@ -22,9 +22,9 @@
 <style>
 /* Hover (or keyboard focus): a see-through white overlay with the name in black */
 .tile::after{content:attr(data-label);position:absolute;inset:0;display:flex;align-items:center;justify-content:center;
-  background:rgba(255,255,255,.72);color:#000;font-size:clamp(3rem,10vw,8rem);line-height:1;letter-spacing:.06em;
-  opacity:0;transition:opacity .3s ease;pointer-events:none}
-.tile .cap,.tile .go,.tile .play{transition:opacity .3s ease}
+  background:rgba(255,255,255,.72);color:#000;font-size:1.4rem;line-height:1;letter-spacing:.14em;
+  opacity:0;transition:opacity .8s ease-in-out;pointer-events:none}
+.tile .cap,.tile .go,.tile .play{transition:opacity .8s ease-in-out}
 .tile:focus-visible::after{opacity:1}
 .tile:focus-visible .cap,.tile:focus-visible .go,.tile:focus-visible .play{opacity:0}
 @media(hover:hover){
