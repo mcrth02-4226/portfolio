@@ -19,6 +19,20 @@
 <meta name="twitter:image" content="https://portfolio.mcartho02.workers.dev/images/event-1-wide.webp">
 <link rel="icon" href="images/favicon.webp">
 <link rel="stylesheet" href="style.css?v=7">
+<style>
+/* Hover (or keyboard focus): a see-through white overlay with the name in black */
+.tile::after{content:attr(data-label);position:absolute;inset:0;display:flex;align-items:center;justify-content:center;
+  background:rgba(255,255,255,.72);color:#000;font-size:clamp(3rem,10vw,8rem);line-height:1;letter-spacing:.06em;
+  opacity:0;transition:opacity .3s ease;pointer-events:none}
+.tile .cap,.tile .go,.tile .play{transition:opacity .3s ease}
+.tile:focus-visible::after{opacity:1}
+.tile:focus-visible .cap,.tile:focus-visible .go,.tile:focus-visible .play{opacity:0}
+@media(hover:hover){
+  .tile:hover::after{opacity:1}
+  .tile:hover .cap,.tile:hover .go,.tile:hover .play{opacity:0}
+}
+@media(prefers-reduced-motion:reduce){.tile::after,.tile .cap,.tile .go,.tile .play{transition:none}}
+</style>
 <script src="site.js?v=6" defer></script>
 <script src="analytics.js?v=6" defer></script>
 </head>
@@ -38,7 +52,7 @@
   <!-- VIDEO: one big image that links to the video page.
        Upload a still frame from your showreel named showreel.webp (or .jpg, .jpeg, .png) to the "images" folder.
        It appears here by itself. The actual showreel plays on the video page. -->
-  <a class="full" href="work/video.html" aria-label="See the video work">
+  <a class="full tile" data-label="Video" href="work/video.html" aria-label="See the video work">
     <div class="ph" data-slot="showreel">showreel</div>
     <span class="play" aria-hidden="true"></span>
     <div class="cap">Video</div>
@@ -46,7 +60,7 @@
   </a>
 
   <!-- PHOTOGRAPHY: one big image that links to the photo page. Upload photography.webp (or .jpg, .jpeg, .png). -->
-  <a class="full" style="margin-top:2px" href="work/photo.html" aria-label="See the photography">
+  <a class="full tile" data-label="Photo" style="margin-top:2px" href="work/photo.html" aria-label="See the photography">
     <div class="ph" data-slot="photography">photography</div>
     <div class="cap">Photography</div>
     <span class="go">View</span>
