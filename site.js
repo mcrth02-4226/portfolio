@@ -13,7 +13,7 @@
   var LOOK_AHEAD = '350px 150px';  // start loading this far before something scrolls into view
 
   var root = document.documentElement.getAttribute('data-root') || '';
-  var IMG = ['jpg', 'jpeg', 'png', 'webp', 'JPG', 'JPEG', 'PNG', 'WEBP'];
+  var IMG = ['webp', 'jpg', 'jpeg', 'png', 'WEBP', 'JPG', 'JPEG', 'PNG'];
   var VID = ['mp4', 'MP4', 'webm', 'mov', 'MOV'];
   var ICO = ['png', 'ico', 'jpg', 'jpeg', 'webp', 'svg'];
   var lastImg = null, lastVid = null; // remember which extension worked, try it first next time
@@ -66,6 +66,20 @@
     })();
   }
 
+  /* ---------- alt text: put alt/<same name as the image>.txt in the repo to describe an image ---------- */
+  var ALT_FILES = true;   // set to false to stop looking for alt text files
+  function loadAlt(name, apply) {
+    if (!ALT_FILES || !window.fetch) return;
+    fetch(root + 'alt/' + name + '.txt').then(function (r) {
+      var ct = (r.headers.get('content-type') || '').toLowerCase();
+      if (!r.ok || ct.indexOf('text/html') > -1) return '';
+      return r.text();
+    }).then(function (t) {
+      t = (t || '').replace(/\s+/g, ' ').trim();
+      if (t) apply(t.slice(0, 300));
+    }).catch(function () {});
+  }
+
   /* ---------- photos ---------- */
   function fillImage(el, finish) {
     var name = el.getAttribute('data-slot');
@@ -80,6 +94,7 @@
         img.alt = name.replace(/-/g, ' ') + ' by Otamo Tipa';
         img.className = (el.className.replace(/\bph\b/, '').replace(/\bis-loading\b/, '') + ' reveal').trim();
         img.decoding = 'async';
+        loadAlt(name, function (t) { img.alt = t; });
         el.replaceWith(img);
         requestAnimationFrame(function () { requestAnimationFrame(function () { img.classList.add('in'); }); });
         finish();
@@ -112,6 +127,7 @@
         play.className = 'play';
         clip.appendChild(img);
         clip.appendChild(play);
+        loadAlt(name + '-thumbnail', function (t) { clip.setAttribute('aria-label', 'Play: ' + t); });
         function go() { playClip(clip, name, thumb); }
         clip.addEventListener('click', go);
         clip.addEventListener('keydown', function (e) {
