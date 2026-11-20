@@ -18,23 +18,29 @@
 <meta name="twitter:description" content="Otamo Tipa is a videographer and photographer. Live shows, events, people and places, plus showreels, ads and short-form video.">
 <meta name="twitter:image" content="https://portfolio.mcartho02.workers.dev/images/event-1-wide.webp">
 <link rel="icon" href="../images/favicon.webp">
-<link rel="stylesheet" href="../style.css?v=7">
-<script src="../site.js?v=6" defer></script>
+<link rel="stylesheet" href="../style.css?v=8">
+<script src="../site.js?v=7" defer></script>
 <script src="../analytics.js?v=6" defer></script>
 </head>
 <body>
 
 <header>
   <a href="../index.html">Otamo Tipa</a>
-  <nav aria-label="Video sections">
-    <a href="#showreel">Showreel</a>
-    <a href="#short">Short form</a>
-    <a href="../work.html">Work</a>
-    <a class="nav-contact" href="../contact.html">Contact</a>
-  </nav>
+  <div class="hnav">
+    <nav aria-label="Main">
+      <a href="video.html" aria-current="page">Video</a>
+      <a href="photo.html">Photo</a>
+      <a href="../index.html#about">About</a>
+      <a class="nav-contact" href="../contact.html">Contact</a>
+    </nav>
+    <nav class="sections" aria-label="On this page">
+      <a href="#showreel">Showreel</a>
+      <a href="#short">Short form</a>
+    </nav>
+  </div>
 </header>
 
-<main>
+<main id="top">
 
   <!-- SHOWREEL (full screen, starts at the very top of the page) -->
   <div class="hero" id="showreel">
@@ -67,12 +73,16 @@
   -->
 </main>
 
-<footer>
-  <div>
+<footer class="pagefoot">
+  <div class="bar">
+    <a class="pill left" href="../index.html">Back to home</a>
+    <a class="pill mid" href="#top">Jump to top</a>
+    <a class="pill right" href="photo.html">Go to Photo</a>
+  </div>
+  <div class="info">
     <a href="mailto:otamitto.media@gmail.com">otamitto.media@gmail.com</a>
     <a href="https://instagram.com/otamitto" target="_blank" rel="noopener">Instagram</a>
   </div>
-  <a href="../work.html">Back to work</a>
 </footer>
 
 </body>
