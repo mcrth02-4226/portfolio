@@ -3,10 +3,22 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Otamo Tipa</title>
-<meta name="description" content="Video and photography by Otamo Tipa: showreel, short form and photography.">
-<link rel="icon" type="image/jpeg" href="images/alasalimatcutplace_3.1.1.jpg">
-<link rel="stylesheet" href="style.css?v=6">
+<title>Otamo Tipa | Work</title>
+<meta name="description" content="Video and photography by Otamo Tipa: showreel, short form, event, portrait and aerial photography.">
+<!-- Link preview (shown when the link is shared). When you get your own domain, replace https://portfolio.mcartho02.workers.dev below with it. -->
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="Otamo Tipa">
+<meta property="og:title" content="Otamo Tipa | Work">
+<meta property="og:description" content="Otamo Tipa is a videographer and photographer. Live shows, events, people and places, plus showreels, ads and short-form video.">
+<meta property="og:url" content="https://portfolio.mcartho02.workers.dev/work">
+<meta property="og:image" content="https://portfolio.mcartho02.workers.dev/images/event-1-wide.webp">
+<meta property="og:image:alt" content="Otamo Tipa, videography and photography">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Otamo Tipa | Work">
+<meta name="twitter:description" content="Otamo Tipa is a videographer and photographer. Live shows, events, people and places, plus showreels, ads and short-form video.">
+<meta name="twitter:image" content="https://portfolio.mcartho02.workers.dev/images/event-1-wide.webp">
+<link rel="icon" href="images/favicon.webp">
+<link rel="stylesheet" href="style.css?v=7">
 <script src="site.js?v=6" defer></script>
 <script src="analytics.js?v=6" defer></script>
 </head>
@@ -15,7 +27,7 @@
 <header>
   <a href="index.html">Otamo Tipa</a>
   <nav aria-label="Work sections">
-    <a href="#video">Video</a>
+    <a href="work/video.html">Video</a>
     <a href="work/photo.html">Photo</a>
     <a class="nav-contact" href="contact.html">Contact</a>
   </nav>
@@ -23,44 +35,23 @@
 
 <main>
 
-  <!-- SHOWREEL (full screen) -->
-  <div class="hero" id="video">
-    <!-- STEP 1: Replace the placeholder with your Vimeo or YouTube embed.
-         YouTube: <div class="embed r16"><iframe src="https://www.youtube.com/embed/VIDEO_ID" title="Otamo Tipa showreel" allowfullscreen></iframe></div>
-         Vimeo:   <div class="embed r16"><iframe src="https://player.vimeo.com/video/VIDEO_ID" title="Otamo Tipa showreel" allowfullscreen></iframe></div> -->
-    <div class="ph r16">Showreel embed</div>
-    <div class="cap">Showreel</div>
-  </div>
+  <!-- VIDEO: one big image that links to the video page.
+       Upload a still frame from your showreel named showreel.webp (or .jpg, .jpeg, .png) to the "images" folder.
+       It appears here by itself. The actual showreel plays on the video page. -->
+  <a class="full" href="work/video.html" aria-label="See the video work">
+    <div class="ph" data-slot="showreel">showreel</div>
+    <span class="play" aria-hidden="true"></span>
+    <div class="cap">Video</div>
+    <span class="go">View</span>
+  </a>
 
-  <!-- SHORT FORM -->
-  <div class="label" id="short">Short form</div>
-  <!-- Short form: each box waits for a thumbnail image named short-form-1-thumbnail
-       (images folder, .jpg/.jpeg/.png/.webp, horizontal 4:3). Visitors see the thumbnail; when they click it,
-       the video (clips folder, named short-form-1.mp4) loads and plays. Same for 2, 3 and 4.
-       Keep each MP4 under about 10 MB. -->
-  <div class="clips43">
-    <div class="ph r43" data-clip="short-form-1" data-ratio="r43">short-form-1-thumbnail</div>
-    <div class="ph r43" data-clip="short-form-2" data-ratio="r43">short-form-2-thumbnail</div>
-    <div class="ph r43" data-clip="short-form-3" data-ratio="r43">short-form-3-thumbnail</div>
-    <div class="ph r43" data-clip="short-form-4" data-ratio="r43">short-form-4-thumbnail</div>
-  </div>
-
-  <!-- PHOTOGRAPHY: one big image that links to the photo page -->
-  <div class="label">Photography</div>
-  <!-- Upload a file named photography.jpg (or .jpeg, .png, .webp) to the "images" folder. It appears here by itself. -->
-  <a class="full" href="work/photo.html" aria-label="See the photography">
+  <!-- PHOTOGRAPHY: one big image that links to the photo page. Upload photography.webp (or .jpg, .jpeg, .png). -->
+  <a class="full" style="margin-top:2px" href="work/photo.html" aria-label="See the photography">
     <div class="ph" data-slot="photography">photography</div>
     <div class="cap">Photography</div>
     <span class="go">View</span>
   </a>
 
-  <!-- SPEC ADS (hidden until you have some). To show them, remove the comment markers that open on this line and close on the last line of this block, keeping the content between.
-  <div class="label" id="ads">Spec ads</div>
-  <div class="stack">
-    <div><div class="ph r16">Spec ad 1 embed</div><div class="cap">Spec ad title</div></div>
-    <div><div class="ph r16">Spec ad 2 embed</div><div class="cap">Spec ad title</div></div>
-  </div>
-  -->
 </main>
 
 <footer>
