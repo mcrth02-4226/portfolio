@@ -17,18 +17,23 @@
 <meta name="twitter:title" content="Otamo Tipa | Photo">
 <meta name="twitter:description" content="Otamo Tipa is a videographer and photographer. Live shows, events, people and places, plus showreels, ads and short-form video.">
 <meta name="twitter:image" content="https://portfolio.mcartho02.workers.dev/images/event-1-wide.webp">
+<link rel="canonical" href="https://portfolio.mcartho02.workers.dev/work/photo">
+<meta name="theme-color" content="#0b0b0c">
+<link rel="preload" href="../fonts/Fifties_Movies.woff" as="font" type="font/woff" crossorigin>
+<link rel="preload" as="image" href="../images/event-1-wide.webp" fetchpriority="high">
 <link rel="icon" href="../images/favicon.webp">
-<link rel="stylesheet" href="../style.css?v=9">
+<link rel="stylesheet" href="../style.css?v=11">
 <style>
 /* Event layout, kept here too so it works even if style.css is cached */
 .photos.ev{grid-template-columns:repeat(3,1fr)}
 .photos .wide{grid-column:1/-1;aspect-ratio:12/5;width:100%;object-fit:cover}
 .event{margin-bottom:2.5rem}
 </style>
-<script src="../site.js?v=8" defer></script>
-<script src="../analytics.js?v=6" defer></script>
+<script src="../site.js?v=10" defer></script>
+<script src="../analytics.js?v=7" defer></script>
 </head>
 <body>
+<a class="skip" href="#top">Skip to content</a>
 
 <header>
   <a href="../index.html">Otamo Tipa</a>
@@ -48,12 +53,14 @@
 </header>
 
 <main id="top">
+  <h1 class="sr">Photography by Otamo Tipa</h1>
 
   <!-- EVENT (starts at the very top of the page): four events. Each has a wide photo and 3 photos under it.
        Upload files to the "images" folder named exactly as shown in each box,
        for example event-2-wide.jpg or event-4-photo-2.jpg. They appear by themselves.
        Change the text under each block ("Event 1 name") to the real event name. -->
   <div class="event" id="event">
+    <h2 class="sr">Event</h2>
     <div class="photos ev">
       <div class="ph wide" data-slot="event-1-wide">event-1-wide</div>
       <div class="ph r45" data-slot="event-1-photo-1">event-1-photo-1</div>
@@ -93,7 +100,7 @@
   -->
 
   <!-- PORTRAIT: portrait-1 to portrait-6 -->
-  <div class="label" id="portrait">Portrait</div>
+  <h2 class="label" id="portrait">Portrait</h2>
   <div class="photos">
       <div class="ph r45" data-slot="portrait-1">portrait-1</div>
       <div class="ph r45" data-slot="portrait-2">portrait-2</div>
@@ -104,7 +111,7 @@
   </div>
 
   <!-- AERIAL: the 360 first, then aerial-1 to aerial-6 -->
-  <div class="label" id="aerial">Aerial</div>
+  <h2 class="label" id="aerial">Aerial</h2>
   <div class="embed r360">
     <iframe title="360 aerial view" loading="lazy" allowfullscreen allow="xr-spatial-tracking; gyroscope; accelerometer; fullscreen" src="https://kuula.co/share/LnHZp?logo=1&amp;info=1&amp;fs=1&amp;vr=0&amp;autorotate=-0.43&amp;thumbs=1"></iframe>
   </div>
