@@ -1,30 +1,49 @@
-/* Otamo Tipa: automatic media linking, loading effect and clip thumbnails.
+/* Otamo Tipa: automatic media linking, loading effect, clip thumbnails and the section menu.
    (Analytics lives in analytics.js.)
 
    FILE NAMES
-   - Every empty box on the pages shows the exact file name it is waiting for.
-   - Upload a file with that name to the "images" folder (.jpg, .jpeg, .png or .webp) and it appears by itself.
+   - Every empty box on the pages shows the exact file name it is waiting for (only once we know it is missing).
+   - Upload a file with that name to the "images" folder (.webp, .jpg, .jpeg, .png, .JPG or .JPEG) and it appears by itself.
    - Short-form clips: thumbnails are images named short-form-1-thumbnail (images folder);
      the videos are short-form-1.mp4 (clips folder). The video loads only when someone clicks the thumbnail.
-   - Tab icon: images/favicon.png (or .ico, .jpg, .svg).
+   - Alt text: alt/<same name as the image>.txt
+   - Tab icon: images/favicon.webp (or .png, .ico, .jpg, .jpeg, .svg).
    Media loads only as you scroll near it, a few files at a time. */
 (function () {
+  'use strict';
+
   var MAX_AT_ONCE = 3;             // files loading at the same time
   var LOOK_AHEAD = '350px 150px';  // start loading this far before something scrolls into view
+  var ALT_FILES = true;            // set to false to stop looking for alt text files
+  var ANIMATE_AFTER = 120;         // ms: the focusing animation only shows if a photo takes longer than this
 
   var root = document.documentElement.getAttribute('data-root') || '';
-  var IMG = ['webp', 'jpg', 'jpeg', 'png', 'WEBP', 'JPG', 'JPEG', 'PNG'];
+  var IMG = ['webp', 'jpg', 'jpeg', 'png', 'JPG', 'JPEG'];
   var VID = ['mp4', 'MP4', 'webm', 'mov', 'MOV'];
-  var ICO = ['png', 'ico', 'jpg', 'jpeg', 'webp', 'svg'];
-  var lastImg = null, lastVid = null; // remember which extension worked, try it first next time
+  var ICO = ['webp', 'png', 'ico', 'jpg', 'jpeg', 'svg'];
+  var lastImg = null, lastVid = null;       // remember which file type worked, try it first next time
 
   function track(name, data) { if (window.track) window.track(name, data); }
   function order(list, first) {
     return first ? [first].concat(list.filter(function (e) { return e !== first; })) : list;
   }
-  function extOf(url) { return url.split('#')[0].split('.').pop(); }
+  function extOf(url) { return url.split('#')[0].split('?')[0].split('.').pop(); }
+  function nextFrame(fn) { requestAnimationFrame(function () { requestAnimationFrame(fn); }); }
 
-  // Only a few downloads at once
+  /* ---------- short memory (this browser tab only) so moving between pages does not repeat lookups ---------- */
+  function cget(key) {
+    try {
+      var v = JSON.parse(sessionStorage.getItem('ot:' + key));
+      if (!v) return null;
+      var ttl = v.u === null ? 90000 : 600000;     // "not found" is remembered 90 s, a found file 10 min
+      return (Date.now() - v.t > ttl) ? null : v;
+    } catch (e) { return null; }
+  }
+  function cset(key, u) {
+    try { sessionStorage.setItem('ot:' + key, JSON.stringify({ u: u, t: Date.now() })); } catch (e) {}
+  }
+
+  /* ---------- only a few downloads at once ---------- */
   var active = 0, queue = [];
   function enqueue(job) { queue.push(job); pump(); }
   function pump() {
@@ -34,73 +53,98 @@
     }
   }
 
-  // Does this file exist? A tiny HEAD request (no download). Falls back to loading the file
-  // when HEAD isn't possible, for example when the site is opened from a local folder.
-  var headOK = true;
-  function exists(url, kind, cb) {
-    function viaElement() {
-      if (kind === 'image') {
-        var im = new Image();
-        im.onload = function () { cb(true); };
-        im.onerror = function () { cb(false); };
-        im.src = url;
-      } else {
-        var v = document.createElement('video');
-        v.preload = 'metadata';
-        v.onloadedmetadata = function () { cb(true); };
-        v.onerror = function () { cb(false); };
-        v.src = url;
+  /* ---------- find an image: load it straight away, one request when the file type is guessed right ---------- */
+  function tryLoad(url, ok, bad) {
+    var im = new Image();
+    im.decoding = 'async';
+    im.onload = function () { ok(url); };
+    im.onerror = bad;
+    im.src = url;
+  }
+  function findImage(folder, name, exts, cb) {
+    var key = folder + '/' + name, c = cget(key);
+    if (c && c.u === null) { cb(null); return; }           // looked a moment ago: not there
+    var all = order(exts, lastImg).map(function (e) { return root + folder + '/' + name + '.' + e; });
+    var list = (c && c.u) ? [c.u].concat(all.filter(function (u) { return u !== c.u; })) : all;
+    function found(url) { lastImg = extOf(url); cset(key, url); cb(url); }
+    // 1) the most likely file type on its own (one request when the guess is right, which is nearly always)
+    tryLoad(list[0], function () { found(list[0]); }, function () {
+      // 2) otherwise try the other types all at once, so a missing file is settled in one extra round trip
+      var rest = list.slice(1), pending = rest.length, hits = [];
+      if (!pending) { cset(key, null); cb(null); return; }
+      rest.forEach(function (url, i) {
+        tryLoad(url, function () { hits.push([i, url]); settle(); }, settle);
+      });
+      function settle() {
+        if (--pending) return;
+        if (!hits.length) { cset(key, null); cb(null); return; }
+        hits.sort(function (a, b) { return a[0] - b[0]; });
+        found(hits[0][1]);
       }
+    });
+  }
+
+  /* ---------- video lookup (only when someone clicks a clip): a tiny HEAD request ---------- */
+  var headOK = true;
+  function exists(url, cb) {
+    function viaElement() {
+      var v = document.createElement('video');
+      v.preload = 'metadata';
+      v.onloadedmetadata = function () { cb(true); };
+      v.onerror = function () { cb(false); };
+      v.src = url;
     }
     if (!headOK || !window.fetch) { viaElement(); return; }
     fetch(url, { method: 'HEAD' }).then(function (r) {
-      cb(r.ok && (r.headers.get('content-type') || '').indexOf(kind) === 0);
+      cb(r.ok && (r.headers.get('content-type') || '').indexOf('video') === 0);
     }).catch(function () { headOK = false; viaElement(); });
   }
-  function find(folder, name, exts, kind, cb) {
-    var i = 0;
+  function findVideo(name, cb) {
+    var list = order(VID, lastVid), i = 0;
     (function next() {
-      if (i >= exts.length) { cb(null); return; }
-      var url = root + folder + '/' + name + '.' + exts[i++];
-      exists(url, kind, function (ok) { if (ok) cb(url); else next(); });
+      if (i >= list.length) { cb(null); return; }
+      var url = root + 'clips/' + name + '.' + list[i++];
+      exists(url, function (ok) { if (ok) cb(url); else next(); });
     })();
   }
 
-  /* ---------- alt text: put alt/<same name as the image>.txt in the repo to describe an image ---------- */
-  var ALT_FILES = true;   // set to false to stop looking for alt text files
+  /* ---------- alt text: alt/<same name as the image>.txt ---------- */
   function loadAlt(name, apply) {
     if (!ALT_FILES || !window.fetch) return;
+    var key = 'alt/' + name, c = cget(key);
+    if (c) { if (c.u) apply(c.u); return; }
     fetch(root + 'alt/' + name + '.txt').then(function (r) {
       var ct = (r.headers.get('content-type') || '').toLowerCase();
       if (!r.ok || ct.indexOf('text/html') > -1) return '';
       return r.text();
     }).then(function (t) {
-      t = (t || '').replace(/\s+/g, ' ').trim();
-      if (t) apply(t.slice(0, 300));
+      t = (t || '').replace(/\s+/g, ' ').trim().slice(0, 300);
+      cset(key, t || null);
+      if (t) apply(t);
     }).catch(function () {});
   }
 
   /* ---------- photos ---------- */
   function fillImage(el, finish) {
     var name = el.getAttribute('data-slot');
-    find('images', name, order(IMG, lastImg), 'image', function (url) {
-      if (!url) { finish(); return; }            // not uploaded yet: the file name stays visible
-      lastImg = extOf(url);
-      el.classList.add('is-loading');            // the file exists: show the focusing animation
-      var im = new Image();
-      im.onload = function () {
-        var img = document.createElement('img');
-        img.src = url;
-        img.alt = name.replace(/-/g, ' ') + ' by Otamo Tipa';
-        img.className = (el.className.replace(/\bph\b/, '').replace(/\bis-loading\b/, '') + ' reveal').trim();
-        img.decoding = 'async';
-        loadAlt(name, function (t) { img.alt = t; });
-        el.replaceWith(img);
-        requestAnimationFrame(function () { requestAnimationFrame(function () { img.classList.add('in'); }); });
+    var timer = setTimeout(function () { el.classList.add('is-loading'); }, ANIMATE_AFTER);
+    findImage('images', name, IMG, function (url) {
+      clearTimeout(timer);
+      if (!url) {                                            // not uploaded yet: only now is the file name shown
+        el.classList.remove('is-loading');
+        el.classList.add('missing');
         finish();
-      };
-      im.onerror = function () { el.classList.remove('is-loading'); finish(); };
-      im.src = url;
+        return;
+      }
+      var img = document.createElement('img');
+      img.src = url;                                         // already downloaded, so this is instant
+      img.alt = name.replace(/-/g, ' ') + ' by Otamo Tipa';
+      img.decoding = 'async';
+      img.className = (el.className.replace(/\bph\b/, '').replace(/\bis-loading\b/, '') + ' reveal').trim();
+      loadAlt(name, function (t) { img.alt = t; });
+      el.replaceWith(img);
+      nextFrame(function () { img.classList.add('in'); });
+      finish();
     });
   }
 
@@ -108,53 +152,48 @@
   function fillClip(el, finish) {
     var name = el.getAttribute('data-clip');
     var ratio = el.getAttribute('data-ratio') || 'r43';
-    find('images', name + '-thumbnail', order(IMG, lastImg), 'image', function (thumb) {
-      if (!thumb) { finish(); return; }
-      lastImg = extOf(thumb);
-      el.classList.add('is-loading');
-      var im = new Image();
-      im.onload = function () {
-        var clip = document.createElement('div');
-        clip.className = 'clip ' + ratio;
-        clip.setAttribute('role', 'button');
-        clip.setAttribute('tabindex', '0');
-        clip.setAttribute('aria-label', 'Play ' + name.replace(/-/g, ' '));
-        var img = document.createElement('img');
-        img.alt = '';
-        img.src = thumb;
-        img.className = 'reveal';
-        var play = document.createElement('span');
-        play.className = 'play';
-        clip.appendChild(img);
-        clip.appendChild(play);
-        loadAlt(name + '-thumbnail', function (t) { clip.setAttribute('aria-label', 'Play: ' + t); });
-        function go() { playClip(clip, name, thumb); }
-        clip.addEventListener('click', go);
-        clip.addEventListener('keydown', function (e) {
-          if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); go(); }
-        });
-        el.replaceWith(clip);
-        requestAnimationFrame(function () { requestAnimationFrame(function () { img.classList.add('in'); }); });
-        finish();
-      };
-      im.onerror = function () { el.classList.remove('is-loading'); finish(); };
-      im.src = thumb;
+    var timer = setTimeout(function () { el.classList.add('is-loading'); }, ANIMATE_AFTER);
+    findImage('images', name + '-thumbnail', IMG, function (thumb) {
+      clearTimeout(timer);
+      if (!thumb) { el.classList.remove('is-loading'); el.classList.add('missing'); finish(); return; }
+      var clip = document.createElement('div');
+      clip.className = 'clip ' + ratio;
+      clip.setAttribute('role', 'button');
+      clip.setAttribute('tabindex', '0');
+      clip.setAttribute('aria-label', 'Play ' + name.replace(/-/g, ' '));
+      var img = document.createElement('img');
+      img.alt = '';
+      img.src = thumb;
+      img.className = 'reveal';
+      var play = document.createElement('span');
+      play.className = 'play';
+      clip.appendChild(img);
+      clip.appendChild(play);
+      loadAlt(name + '-thumbnail', function (t) { clip.setAttribute('aria-label', 'Play: ' + t); });
+      function go() { playClip(clip, name, thumb); }
+      clip.addEventListener('click', go);
+      clip.addEventListener('keydown', function (e) {
+        if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); go(); }
+      });
+      el.replaceWith(clip);
+      nextFrame(function () { img.classList.add('in'); });
+      finish();
     });
+  }
+
+  function message(clip, text) {
+    var msg = document.createElement('span');
+    msg.className = 'msg';
+    msg.textContent = text;
+    clip.appendChild(msg);
   }
 
   function playClip(clip, name, thumb) {
     if (clip.classList.contains('is-loading') || clip.classList.contains('playing')) return;
     clip.classList.add('is-loading');
     track('clip_play', { clip: name });
-    find('clips', name, order(VID, lastVid), 'video', function (url) {
-      if (!url) {
-        clip.classList.remove('is-loading');
-        var msg = document.createElement('span');
-        msg.className = 'msg';
-        msg.textContent = 'Video coming soon';
-        clip.appendChild(msg);
-        return;
-      }
+    findVideo(name, function (url) {
+      if (!url) { clip.classList.remove('is-loading'); message(clip, 'Video coming soon'); return; }
       lastVid = extOf(url);
       var v = document.createElement('video');
       v.setAttribute('playsinline', '');
@@ -172,10 +211,7 @@
       v.onerror = function () {
         v.remove();
         clip.classList.remove('is-loading');
-        var msg = document.createElement('span');
-        msg.className = 'msg';
-        msg.textContent = 'This video could not be loaded';
-        clip.appendChild(msg);
+        message(clip, 'This video could not be loaded');
       };
       v.src = url;
       clip.appendChild(v);                       // video sits on top, hidden until it can play
@@ -191,11 +227,10 @@
   /* ---------- tab icon ---------- */
   var link = document.querySelector('link[rel~="icon"]');
   if (link) {
-    enqueue(function (finish) {
-      find('images', 'favicon', ICO, 'image', function (url) {
-        if (url) { link.removeAttribute('type'); link.href = url; }
-        finish();
-      });
+    var iconHref = link.getAttribute('href') || '';
+    // the page already points at images/favicon.webp, so only look further if that file is not the one in use
+    findImage('images', 'favicon', ICO, function (url) {
+      if (url && iconHref.indexOf(url.replace(root, '')) === -1) { link.removeAttribute('type'); link.href = url; }
     });
   }
 
@@ -211,6 +246,7 @@
   } else {
     Array.prototype.forEach.call(els, run);
   }
+
   /* ---------- section menu: the link for the section you are in stays bright, the others dim ---------- */
   (function () {
     var links = document.querySelectorAll('nav.sections a[href^="#"]');

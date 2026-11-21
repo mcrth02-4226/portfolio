@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://portfolio.mcartho02.workers.dev/sitemap.xml

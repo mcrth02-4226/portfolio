@@ -5,8 +5,8 @@
 (function () {
   'use strict';
 
-  var CF_TOKEN = 'c89e4b2a0ab243368a1ab9cf146114d0';   // Cloudflare Web Analytics token, for example a32f0c...
-  var UMAMI_ID = 'fdfb7c36-3543-4dcb-9256-7ab2fecb7f55';   // Umami "Website ID", for example 1b2c3d4e-....
+  var CF_TOKEN = '';   // Cloudflare Web Analytics token, for example a32f0c...
+  var UMAMI_ID = '';   // Umami "Website ID", for example 1b2c3d4e-....
   var UMAMI_SRC = 'https://cloud.umami.is/script.js';
 
   var pending = [];
@@ -19,14 +19,23 @@
     document.head.appendChild(s);
   }
 
-  if (CF_TOKEN) {
-    addScript('https://static.cloudflareinsights.com/beacon.min.js', { 'data-cf-beacon': JSON.stringify({ token: CF_TOKEN }) });
+  // Not while previewing from a local folder or localhost (keeps your numbers clean),
+  // and only after the page has finished loading so analytics never slow down the first view.
+  var LOCAL = location.protocol === 'file:' || /^(localhost|127\.|0\.0\.0\.0|\[::1\])/.test(location.hostname);
+  function whenReady(fn) {
+    function go() { if (window.requestIdleCallback) window.requestIdleCallback(fn, { timeout: 3000 }); else setTimeout(fn, 1500); }
+    if (document.readyState === 'complete') go(); else window.addEventListener('load', go);
   }
-  if (UMAMI_ID) {
-    addScript(UMAMI_SRC, { 'data-website-id': UMAMI_ID }, function () {
-      pending.splice(0).forEach(function (p) { send(p[0], p[1]); });
-    });
-  }
+  if (!LOCAL) whenReady(function () {
+    if (CF_TOKEN) {
+      addScript('https://static.cloudflareinsights.com/beacon.min.js', { 'data-cf-beacon': JSON.stringify({ token: CF_TOKEN }) });
+    }
+    if (UMAMI_ID) {
+      addScript(UMAMI_SRC, { 'data-website-id': UMAMI_ID }, function () {
+        pending.splice(0).forEach(function (p) { send(p[0], p[1]); });
+      });
+    }
+  });
 
   function send(name, data) {
     if (window.umami && window.umami.track) {
@@ -35,7 +44,7 @@
   }
   // site.js calls this for events such as clip_play
   window.track = function (name, data) {
-    if (!UMAMI_ID) return;
+    if (!UMAMI_ID || LOCAL) return;
     if (window.umami && window.umami.track) send(name, data); else pending.push([name, data]);
   };
 
