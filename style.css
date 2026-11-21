@@ -2,7 +2,7 @@
 :root{--night:#0b0b0c;--panel:#161617;--edge:#2a2a2c;--text:#ededee;--muted:#8d8d92;--pad:1.25rem}
 *{box-sizing:border-box;margin:0}
 html{scroll-behavior:smooth}
-body{font-family:"Fifties Movies","Helvetica Neue",Helvetica,Arial,sans-serif;font-synthesis:none;letter-spacing:.03em;background:var(--night);color:var(--text);font-size:1.05rem;line-height:1.5;-webkit-font-smoothing:antialiased}
+body{font-family:"Helvetica Neue",Helvetica,Arial,sans-serif;background:var(--night);color:var(--text);font-size:.82rem;line-height:1.5;-webkit-font-smoothing:antialiased}
 button,input,textarea{font-family:inherit}
 a{color:inherit;text-decoration:none}
 a:hover{color:var(--muted)}
@@ -50,7 +50,7 @@ footer div{display:flex;gap:1.25rem;flex-wrap:wrap}
 
 /* About with a photo on the right edge */
 .about{display:grid;grid-template-columns:1fr minmax(150px,36%);gap:var(--pad);align-items:start;padding:0 0 4rem var(--pad)}
-.about .small{padding:0;max-width:48ch;font-size:1.35rem;line-height:1.5}
+.about .small{padding:0;max-width:48ch;font-size:1rem;line-height:1.6}
 .me img{width:100%;aspect-ratio:4/5;object-fit:cover;display:block}
 .label.big{padding-top:5rem}
 
@@ -132,7 +132,7 @@ header a::before{content:"";position:absolute;inset:-9px -6px}  /* bigger tap ar
 .nav-contact:hover,.nav-contact:focus-visible{text-shadow:none}
 .hnav{display:flex;flex-direction:column;align-items:flex-end;gap:.75rem}
 .hnav nav{display:flex;flex-wrap:wrap;justify-content:flex-end;gap:.35rem 1.1rem}
-.hnav nav.sections{flex-direction:column;flex-wrap:nowrap;align-items:flex-end;gap:.45rem;font-size:.95rem}
+.hnav nav.sections{flex-direction:column;flex-wrap:nowrap;align-items:flex-end;gap:.45rem;font-size:1em}
 .hnav nav.sections a{opacity:.85}
 .hnav nav.sections a:hover,.hnav nav.sections a:focus-visible{opacity:1}
 
@@ -160,7 +160,7 @@ footer.pagefoot{display:block;padding:3rem var(--pad) var(--pad)}
 .info{margin-top:1.6rem;display:flex;justify-content:center;gap:1.25rem;flex-wrap:wrap;color:var(--muted)}
 .info a{position:relative}
 .info a::before{content:"";position:absolute;inset:-9px -6px}
-@media(max-width:480px){.pill{padding:.5rem .7rem;font-size:.95rem}}
+@media(max-width:480px){.pill{padding:.5rem .7rem}}
 
 /* ================= Section menu: centred on the right edge, current section stays bright ================= */
 .hnav nav.sections a{opacity:.6;padding-right:.75rem;border-right:2px solid transparent;
@@ -183,4 +183,4 @@ h1,h2{font:inherit;margin:0}
 .skip:focus{top:.75rem}
 
 /* keep the name on one line in the header, even on narrow phones */
-header>a{white-space:nowrap}
+header>a{white-space:nowrap;font-family:"Fifties Movies","Helvetica Neue",Helvetica,Arial,sans-serif;font-size:1.05rem;letter-spacing:.03em;font-synthesis:none}
