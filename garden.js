@@ -11,8 +11,9 @@
   /* ---------- settings ---------- */
   var COL = { rose: '#FF1400', stem: '#3257FF', line: '#FFB4A8', vein: '#000000' };  // vein = page background
   var AUTO_DELAY = 1000;      // ms after load before it grows by itself on touch screens
-  var GROW_MS = 2400;         // how long the whole garden takes to grow
-  var WITHER_SPEED = 3;       // how much faster it withers than it grows
+  var TOTAL_MS = 1000;        // how long the whole garden takes to grow, in milliseconds
+  var WITHER_SPEED = 2;       // withering is this many times faster than growing
+  var GROW_MS = 3600;         // inner timing (the shape of the animation); TOTAL_MS squeezes it all into the time above
 
   var mail = document.querySelector('.mail');
   if (!mail || !mail.firstChild || mail.firstChild.nodeType !== 3) return;
@@ -49,7 +50,7 @@
   }
   function clamp01(v) { return v < 0 ? 0 : v > 1 ? 1 : v; }
   function easeOut(t) { t = clamp01(t); return 1 - Math.pow(1 - t, 3); }
-  function spring(t) { return t <= 0 ? 0 : 1 - Math.exp(-t * 6) * Math.cos(t * 12); }   // opens with a small overshoot
+  function easeInOut(t) { return 0.5 - 0.5 * Math.cos(Math.PI * clamp01(t)); }              // slow start, steady middle, soft landing
   function hash(n) { var x = Math.sin(n * 127.1) * 43758.5453; return x - Math.floor(x); }
 
   /* ---------- where the letters are ---------- */
@@ -66,7 +67,7 @@
   }
 
   /* ---------- building a garden ---------- */
-  var seed = 1, stems = [], uid = 0, END = GROW_MS + 1400;
+  var seed = 1, stems = [], uid = 0, END = GROW_MS + 1400, K = 1;
 
   function vine(x, y, dir, len, amp, waves, ph, bend) {
     var n = 34, step = len / n, pts = [[x, y]];
@@ -92,7 +93,7 @@
 
     function addStem(o) {
       var pts = vine(o.x, o.y, o.dir, o.len, o.amp, o.waves, o.ph, o.bend);
-      var st = { id: ++uid, pts: pts, d0: o.d0, dur: Math.max(380, o.len / U * 560), w: lineW, layer: o.layer, leaves: [], rose: null };
+      var st = { id: ++uid, pts: pts, d0: o.d0, dur: Math.max(900, o.len / U * 1100), w: lineW, layer: o.layer, leaves: [], rose: null };
       var nl = Math.floor(r() * 3), side = r() < 0.5 ? -1 : 1;
       for (var i = 0; i < nl; i++) {
         var u = 0.25 + r() * 0.55, p = pointAt(pts, u); side = -side;
@@ -116,7 +117,7 @@
     }
 
     m.letters.forEach(function (l, i) {
-      var d0 = (i / Math.max(1, n)) * GROW_MS * 0.5 + r() * 90, base = l.cy + m.fs * 0.3, top = l.cy - m.fs * 0.3;
+      var d0 = (i / Math.max(1, n)) * GROW_MS * 0.55 + r() * 200, base = l.cy + m.fs * 0.3, top = l.cy - m.fs * 0.3;
       var ups = (l.ch === '.' || l.ch === '@') ? 1 : 1 + (r() < 0.55 * dens ? 1 : 0);
       for (var k = 0; k < ups; k++) {
         addStem({ x: l.x + (r() - 0.5) * l.w * 0.6, y: base - r() * m.fs * 0.4, dir: -Math.PI / 2 + (r() - 0.5) * 0.8, len: U * (0.9 + r() * 1.7),
@@ -127,6 +128,9 @@
           amp: 0.3 + r() * 0.3, waves: 1 + r(), ph: r() * 6.28, bend: (r() - 0.5), d0: d0 + 100, layer: 0, tip: r() < 0.5 ? 'curl' : 'leaf' });
       }
     });
+    END = 600;
+    stems.forEach(function (st) { END = Math.max(END, st.d0 + st.dur * 0.8 + 2400); });   // when the last rose has fully opened
+    K = Math.max(1, END / TOTAL_MS);                                                          // play the whole thing in TOTAL_MS
   }
 
   /* ---------- drawing ---------- */
@@ -148,16 +152,22 @@
     g.restore();
   }
   var PETALS = [[0, -0.3, 0.52, 0.5, 0], [-0.46, -0.04, 0.55, 0.55, -0.35], [0.46, -0.04, 0.55, 0.55, 0.35], [-0.38, 0.28, 0.57, 0.44, 0.2], [0.38, 0.28, 0.57, 0.44, -0.2], [0, 0.38, 0.5, 0.36, 0]];
-  function drawRose(g, ro, p) {
-    var s = spring(p); if (s <= 0.01) return;
-    var R = ro.R;
-    g.save(); g.translate(ro.x, ro.y); g.rotate(ro.rot); g.scale(s, s);
+  function drawRose(g, ro, t) {              // t = milliseconds since the stem has almost reached its tip
+    if (t <= 0) return;
+    var R = ro.R, bud = easeOut(t / 700);       // first a small closed bud
+    g.save(); g.translate(ro.x, ro.y); g.rotate(ro.rot + (1 - easeOut(t / 2600)) * 0.5);
     g.fillStyle = COL.rose;
-    for (var i = 0; i < PETALS.length; i++) { var q = PETALS[i]; g.beginPath(); g.ellipse(q[0] * R, q[1] * R, q[2] * R, q[3] * R, q[4], 0, Math.PI * 2); g.fill(); }
-    if (R > 4) {
+    for (var i = 0; i < PETALS.length; i++) {   // then the petals unfold one after another, back to front
+      var q = PETALS[i], sc = (0.2 + 0.8 * easeOut((t - 300 - i * 150) / 950)) * bud;
+      if (sc <= 0.02) continue;
+      g.beginPath(); g.ellipse(q[0] * R * sc, q[1] * R * sc, q[2] * R * sc, q[3] * R * sc, q[4], 0, Math.PI * 2); g.fill();
+    }
+    var fr = easeOut((t - 1400) / 1000);        // finally the swirl draws itself
+    if (R > 4 && fr > 0) {
       g.strokeStyle = COL.line; g.lineWidth = Math.max(0.9, R * 0.05); g.lineCap = 'round'; g.lineJoin = 'round';
       g.beginPath();
-      for (var j = 0; j <= 60; j++) {
+      var last = Math.floor(60 * fr);
+      for (var j = 0; j <= last; j++) {
         var u = j / 60, th = ro.ph + u * ro.turns * Math.PI * 2, rr = R * (0.08 + 0.55 * u), x = Math.cos(th) * rr, y = Math.sin(th) * rr * 0.75 - 0.1 * R;
         if (j) g.lineTo(x, y); else g.moveTo(x, y);
       }
@@ -176,23 +186,23 @@
       g.lineCap = 'round'; g.lineJoin = 'round';
       for (var i = 0; i < stems.length; i++) {
         var st = stems[i]; if (st.layer !== layer) continue;
-        var f = easeOut((T - st.d0) / st.dur); if (f <= 0) continue;
+        var f = easeInOut((T - st.d0) / st.dur); if (f <= 0) continue;
         g.save();
         g.translate((hash(st.id + boil * 7.1) - 0.5) * amp * 2, (hash(st.id * 3.3 + boil * 2.7) - 0.5) * amp * 2);
         g.strokeStyle = COL.stem; g.lineWidth = st.w;
         strokeFrac(g, st.pts, f);
         for (var k = 0; k < st.leaves.length; k++) {
-          var lf = st.leaves[k], sc = spring((T - (st.d0 + st.dur * lf.u)) / 700);
+          var lf = st.leaves[k], sc = easeOut((T - (st.d0 + st.dur * lf.u)) / 1000);
           if (sc > 0.01) drawLeaf(g, lf.x, lf.y, lf.a, lf.L * sc, lf.bend);
         }
-        if (st.rose) drawRose(g, st.rose, (T - (st.d0 + st.dur * 0.85)) / 900);
+        if (st.rose) drawRose(g, st.rose, T - (st.d0 + st.dur * 0.8));
         g.restore();
       }
     }
   }
   function tick(now) {
     var dt = Math.min(64, now - last); last = now;
-    if (reduce) T = dir > 0 ? END : 0; else T += dir > 0 ? dt : -dt * WITHER_SPEED;
+    if (reduce) T = dir > 0 ? END : 0; else T += (dir > 0 ? dt : -dt * WITHER_SPEED) * K;
     if (T > END) T = END;
     if (T <= 0 && dir < 0) { T = 0; draw(now); dir = 0; running = false; return; }
     draw(now);
