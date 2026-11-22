@@ -184,3 +184,5 @@ h1,h2{font:inherit;margin:0}
 
 /* keep the name on one line in the header, even on narrow phones */
 header>a{white-space:nowrap;font-family:"Fifties Movies","Helvetica Neue",Helvetica,Arial,sans-serif;font-size:1.05rem;letter-spacing:.03em;font-synthesis:none}
+
+.about .small p+p{margin-top:.8rem}

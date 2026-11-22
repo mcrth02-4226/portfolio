@@ -9,19 +9,19 @@
 <meta property="og:type" content="website">
 <meta property="og:site_name" content="Otamo Tipa">
 <meta property="og:title" content="Otamo Tipa | Contact">
-<meta property="og:description" content="Otamo Tipa is a videographer and photographer. Live shows, events, people and places, plus showreels, ads and short-form video.">
+<meta property="og:description" content="Otamo Tipa (Otamitto) is a Helsinki-based photographer, filmmaker and cinematographer. Event photography and video, portraits, aerial and short-form work.">
 <meta property="og:url" content="https://portfolio.mcartho02.workers.dev/contact">
 <meta property="og:image" content="https://portfolio.mcartho02.workers.dev/images/event-1-wide.webp">
 <meta property="og:image:alt" content="Otamo Tipa, videography and photography">
 <meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:title" content="Otamo Tipa | Contact">
-<meta name="twitter:description" content="Otamo Tipa is a videographer and photographer. Live shows, events, people and places, plus showreels, ads and short-form video.">
+<meta name="twitter:description" content="Otamo Tipa (Otamitto) is a Helsinki-based photographer, filmmaker and cinematographer. Event photography and video, portraits, aerial and short-form work.">
 <meta name="twitter:image" content="https://portfolio.mcartho02.workers.dev/images/event-1-wide.webp">
 <link rel="canonical" href="https://portfolio.mcartho02.workers.dev/contact">
 <meta name="theme-color" content="#0b0b0c">
 <link rel="preload" href="fonts/Fifties_Movies.woff" as="font" type="font/woff" crossorigin>
 <link rel="icon" href="images/favicon.webp">
-<link rel="stylesheet" href="style.css?v=12">
+<link rel="stylesheet" href="style.css?v=14">
 <style>
 body{background:#000}
 main{min-height:100svh;display:grid;place-items:center;padding:6rem var(--pad) 4rem}
@@ -45,6 +45,11 @@ main{min-height:100svh;display:grid;place-items:center;padding:6rem var(--pad) 4
 .ig:hover{color:#fff}
 .sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)}
 
+/* flower garden (garden.js): one canvas behind the email, one in front */
+.mail,.eyebrow{position:relative;z-index:2}
+.garden{position:fixed;left:0;top:0;width:100%;height:100%;pointer-events:none}
+.garden.back{z-index:1}
+.garden.front{z-index:3}
 @keyframes rise{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}
 .credits>*{animation:rise .8s ease both}
 .credits>:nth-child(2){animation-delay:.12s}
@@ -53,8 +58,9 @@ main{min-height:100svh;display:grid;place-items:center;padding:6rem var(--pad) 4
 .credits>:nth-child(5){animation-delay:.48s}
 @media(prefers-reduced-motion:reduce){.credits>*{animation:none}.mail{transition:none}}
 </style>
-<script src="site.js?v=5" defer></script>
-<script src="analytics.js?v=5" defer></script>
+<script src="site.js?v=11" defer></script>
+<script src="analytics.js?v=7" defer></script>
+<script src="garden.js?v=1" defer></script>
 </head>
 <body>
 <a class="skip" href="#top">Skip to content</a>
