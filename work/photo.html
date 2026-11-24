@@ -21,15 +21,16 @@
 <meta name="theme-color" content="#0b0b0c">
 <link rel="preload" href="../fonts/Fifties_Movies.woff" as="font" type="font/woff" crossorigin>
 <link rel="preload" as="image" href="../images/event-1-wide.webp" fetchpriority="high">
+<link rel="preconnect" href="https://kuula.co">
 <link rel="icon" href="../images/favicon.webp">
-<link rel="stylesheet" href="../style.css?v=14">
+<link rel="stylesheet" href="../style.css?v=15">
 <style>
 /* Event layout, kept here too so it works even if style.css is cached */
 .photos.ev{grid-template-columns:repeat(3,1fr)}
 .photos .wide{grid-column:1/-1;aspect-ratio:12/5;width:100%;object-fit:cover}
 .event{margin-bottom:2.5rem}
 </style>
-<script src="../site.js?v=11" defer></script>
+<script src="../site.js?v=12" defer></script>
 <script src="../analytics.js?v=7" defer></script>
 </head>
 <body>
@@ -112,8 +113,8 @@
 
   <!-- AERIAL: the 360 first, then aerial-1 to aerial-6 -->
   <h2 class="label" id="aerial">Aerial</h2>
-  <div class="embed r360">
-    <iframe title="360 aerial view" loading="lazy" allowfullscreen allow="xr-spatial-tracking; gyroscope; accelerometer; fullscreen" src="https://kuula.co/share/LnHZp?logo=1&amp;info=1&amp;fs=1&amp;vr=0&amp;autorotate=-0.43&amp;thumbs=1"></iframe>
+  <div class="embed r360 is-loading">
+    <iframe title="360 aerial view" allowfullscreen allow="xr-spatial-tracking; gyroscope; accelerometer; fullscreen" data-src="https://kuula.co/share/LnHZp?logo=1&amp;info=1&amp;fs=1&amp;vr=0&amp;autorotate=-0.43&amp;thumbs=1"></iframe>
   </div>
   <div class="photos" style="margin-top:2px">
       <div class="ph r45" data-slot="aerial-1">aerial-1</div>
