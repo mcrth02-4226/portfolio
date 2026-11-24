@@ -44,14 +44,28 @@
   }
 
   /* ---------- only a few downloads at once ---------- */
-  var active = 0, queue = [];
+  var active = 0, queue = [], done = 0;
   function enqueue(job) { queue.push(job); pump(); }
   function pump() {
     while (active < MAX_AT_ONCE && queue.length) {
       active++;
-      queue.shift()(function () { active--; pump(); });
+      queue.shift()(function () { active--; done++; pump(); });
     }
+    if (!active && !queue.length && done > 0) startFrames();   // the first photos are in: now the 360 view can load
   }
+
+  /* ---------- heavy embeds (the 360 view): load right after the first photos, never before them ---------- */
+  var framesStarted = false;
+  function startFrames() {
+    if (framesStarted) return;
+    framesStarted = true;
+    Array.prototype.forEach.call(document.querySelectorAll('iframe[data-src]'), function (f) {
+      var box = f.parentNode;
+      f.addEventListener('load', function () { box.classList.remove('is-loading'); f.classList.add('in'); }, { once: true });
+      f.src = f.getAttribute('data-src');
+    });
+  }
+  if (document.querySelector('iframe[data-src]')) setTimeout(startFrames, 3000);   // safety: never wait longer than this
 
   /* ---------- find an image: load it straight away, one request when the file type is guessed right ---------- */
   function tryLoad(url, ok, bad) {
@@ -256,11 +270,8 @@
       if (t) items.push({ a: a, t: t });
     });
     if (!items.length) return;
-    var ticking = false, current = null;
-    function update() {
-      ticking = false;
-      var line = window.innerHeight * 0.4, pick = items[0];
-      items.forEach(function (it) { if (it.t.getBoundingClientRect().top <= line) pick = it; });
+    var ticking = false, current = null, locked = null;
+    function apply(pick) {
       if (pick === current) return;
       current = pick;
       items.forEach(function (it) {
@@ -269,7 +280,20 @@
         if (on) it.a.setAttribute('aria-current', 'location'); else it.a.removeAttribute('aria-current');
       });
     }
+    function update() {
+      ticking = false;
+      if (locked) { apply(locked); return; }
+      var line = window.innerHeight * 0.4, pick = items[0];
+      items.forEach(function (it) { if (it.t.getBoundingClientRect().top <= line) pick = it; });
+      apply(pick);
+    }
     function onScroll() { if (!ticking) { ticking = true; requestAnimationFrame(update); } }
+    // after you click a section link it stays highlighted, even for short sections at the very bottom of the page,
+    // until you scroll yourself
+    items.forEach(function (it) { it.a.addEventListener('click', function () { locked = it; apply(it); }); });
+    ['wheel', 'touchmove', 'keydown'].forEach(function (ev) {
+      window.addEventListener(ev, function () { locked = null; onScroll(); }, { passive: true });
+    });
     window.addEventListener('scroll', onScroll, { passive: true });
     window.addEventListener('resize', onScroll);
     update();

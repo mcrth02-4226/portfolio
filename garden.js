@@ -3,23 +3,25 @@
    implementation written for this site: it shares the idea, not the code.
 
    - Computers: hover (or tab to) the email and stems, leaves and roses grow out of its letters; move away and they wither.
-   - Phones and tablets (no hover): the garden grows by itself about one second after the page loads.
+   - Phones and tablets (no hover): nothing happens, the email is just the email.
    Change the colours or the timing in the settings just below. */
 (function () {
   'use strict';
 
   /* ---------- settings ---------- */
   var COL = { rose: '#FF1400', stem: '#3257FF', line: '#FFB4A8', vein: '#000000' };  // vein = page background
-  var AUTO_DELAY = 1000;      // ms after load before it grows by itself on touch screens
-  var TOTAL_MS = 1000;        // how long the whole garden takes to grow, in milliseconds
+  var STAGGER = 300;          // ms: the letters start growing one after another across this time (a wave from left to right)
+  var STEM_MS = 560;          // ms: how long a stem takes to grow (longer stems take a little more)
+  var BLOOM_MS = 450;         // ms: how long a rose takes to open
   var WITHER_SPEED = 2;       // withering is this many times faster than growing
-  var GROW_MS = 3600;         // inner timing (the shape of the animation); TOTAL_MS squeezes it all into the time above
+  // everything is grown after roughly STAGGER + STEM_MS + BLOOM_MS * 0.7 = about 1.2 seconds
 
   var mail = document.querySelector('.mail');
   if (!mail || !mail.firstChild || mail.firstChild.nodeType !== 3) return;
 
   var reduce = window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches;
   var canHover = window.matchMedia && matchMedia('(hover: hover) and (pointer: fine)').matches;
+  if (!canHover) return;                      // phones and tablets: no flowers
 
   /* ---------- two canvases: one behind the email, one in front, so stems weave through the letters ---------- */
   function makeCanvas(cls) {
@@ -50,7 +52,7 @@
   }
   function clamp01(v) { return v < 0 ? 0 : v > 1 ? 1 : v; }
   function easeOut(t) { t = clamp01(t); return 1 - Math.pow(1 - t, 3); }
-  function easeInOut(t) { return 0.5 - 0.5 * Math.cos(Math.PI * clamp01(t)); }              // slow start, steady middle, soft landing
+  function easeStem(t) { t = clamp01(t); return 1 - (1 - t) * (1 - t); }                  // starts moving at once, settles softly at the tip
   function hash(n) { var x = Math.sin(n * 127.1) * 43758.5453; return x - Math.floor(x); }
 
   /* ---------- where the letters are ---------- */
@@ -67,7 +69,7 @@
   }
 
   /* ---------- building a garden ---------- */
-  var seed = 1, stems = [], uid = 0, END = GROW_MS + 1400, K = 1;
+  var seed = 1, stems = [], uid = 0, END = 1500;
 
   function vine(x, y, dir, len, amp, waves, ph, bend) {
     var n = 34, step = len / n, pts = [[x, y]];
@@ -93,7 +95,7 @@
 
     function addStem(o) {
       var pts = vine(o.x, o.y, o.dir, o.len, o.amp, o.waves, o.ph, o.bend);
-      var st = { id: ++uid, pts: pts, d0: o.d0, dur: Math.max(900, o.len / U * 1100), w: lineW, layer: o.layer, leaves: [], rose: null };
+      var st = { id: ++uid, pts: pts, d0: o.d0, dur: STEM_MS * (0.7 + 0.2 * o.len / U), w: lineW, layer: o.layer, leaves: [], rose: null };
       var nl = Math.floor(r() * 3), side = r() < 0.5 ? -1 : 1;
       for (var i = 0; i < nl; i++) {
         var u = 0.25 + r() * 0.55, p = pointAt(pts, u); side = -side;
@@ -117,7 +119,7 @@
     }
 
     m.letters.forEach(function (l, i) {
-      var d0 = (i / Math.max(1, n)) * GROW_MS * 0.55 + r() * 200, base = l.cy + m.fs * 0.3, top = l.cy - m.fs * 0.3;
+      var d0 = (i / Math.max(1, n)) * STAGGER + r() * 60, base = l.cy + m.fs * 0.3, top = l.cy - m.fs * 0.3;
       var ups = (l.ch === '.' || l.ch === '@') ? 1 : 1 + (r() < 0.55 * dens ? 1 : 0);
       for (var k = 0; k < ups; k++) {
         addStem({ x: l.x + (r() - 0.5) * l.w * 0.6, y: base - r() * m.fs * 0.4, dir: -Math.PI / 2 + (r() - 0.5) * 0.8, len: U * (0.9 + r() * 1.7),
@@ -129,8 +131,7 @@
       }
     });
     END = 600;
-    stems.forEach(function (st) { END = Math.max(END, st.d0 + st.dur * 0.8 + 2400); });   // when the last rose has fully opened
-    K = Math.max(1, END / TOTAL_MS);                                                          // play the whole thing in TOTAL_MS
+    stems.forEach(function (st) { END = Math.max(END, st.d0 + st.dur * 0.7 + BLOOM_MS + 100); });   // when the last rose has fully opened
   }
 
   /* ---------- drawing ---------- */
@@ -154,15 +155,15 @@
   var PETALS = [[0, -0.3, 0.52, 0.5, 0], [-0.46, -0.04, 0.55, 0.55, -0.35], [0.46, -0.04, 0.55, 0.55, 0.35], [-0.38, 0.28, 0.57, 0.44, 0.2], [0.38, 0.28, 0.57, 0.44, -0.2], [0, 0.38, 0.5, 0.36, 0]];
   function drawRose(g, ro, t) {              // t = milliseconds since the stem has almost reached its tip
     if (t <= 0) return;
-    var R = ro.R, bud = easeOut(t / 700);       // first a small closed bud
-    g.save(); g.translate(ro.x, ro.y); g.rotate(ro.rot + (1 - easeOut(t / 2600)) * 0.5);
+    var R = ro.R, bud = easeOut(t / (BLOOM_MS * 0.35));       // first a small closed bud
+    g.save(); g.translate(ro.x, ro.y); g.rotate(ro.rot + (1 - easeOut(t / BLOOM_MS)) * 0.5);
     g.fillStyle = COL.rose;
     for (var i = 0; i < PETALS.length; i++) {   // then the petals unfold one after another, back to front
-      var q = PETALS[i], sc = (0.2 + 0.8 * easeOut((t - 300 - i * 150) / 950)) * bud;
+      var q = PETALS[i], sc = (0.2 + 0.8 * easeOut((t - BLOOM_MS * 0.12 - i * BLOOM_MS * 0.07) / (BLOOM_MS * 0.45))) * bud;
       if (sc <= 0.02) continue;
       g.beginPath(); g.ellipse(q[0] * R * sc, q[1] * R * sc, q[2] * R * sc, q[3] * R * sc, q[4], 0, Math.PI * 2); g.fill();
     }
-    var fr = easeOut((t - 1400) / 1000);        // finally the swirl draws itself
+    var fr = easeOut((t - BLOOM_MS * 0.55) / (BLOOM_MS * 0.45));        // finally the swirl draws itself
     if (R > 4 && fr > 0) {
       g.strokeStyle = COL.line; g.lineWidth = Math.max(0.9, R * 0.05); g.lineCap = 'round'; g.lineJoin = 'round';
       g.beginPath();
@@ -186,31 +187,39 @@
       g.lineCap = 'round'; g.lineJoin = 'round';
       for (var i = 0; i < stems.length; i++) {
         var st = stems[i]; if (st.layer !== layer) continue;
-        var f = easeInOut((T - st.d0) / st.dur); if (f <= 0) continue;
+        var f = easeStem((T - st.d0) / st.dur); if (f <= 0) continue;
         g.save();
         g.translate((hash(st.id + boil * 7.1) - 0.5) * amp * 2, (hash(st.id * 3.3 + boil * 2.7) - 0.5) * amp * 2);
         g.strokeStyle = COL.stem; g.lineWidth = st.w;
         strokeFrac(g, st.pts, f);
         for (var k = 0; k < st.leaves.length; k++) {
-          var lf = st.leaves[k], sc = easeOut((T - (st.d0 + st.dur * lf.u)) / 1000);
+          var lf = st.leaves[k], sc = easeOut((T - (st.d0 + st.dur * lf.u)) / (STEM_MS * 0.6));
           if (sc > 0.01) drawLeaf(g, lf.x, lf.y, lf.a, lf.L * sc, lf.bend);
         }
-        if (st.rose) drawRose(g, st.rose, T - (st.d0 + st.dur * 0.8));
+        if (st.rose) drawRose(g, st.rose, T - (st.d0 + st.dur * 0.7));
         g.restore();
       }
     }
   }
   function tick(now) {
     var dt = Math.min(64, now - last); last = now;
-    if (reduce) T = dir > 0 ? END : 0; else T += (dir > 0 ? dt : -dt * WITHER_SPEED) * K;
+    T += dir > 0 ? dt : -dt * WITHER_SPEED;
     if (T > END) T = END;
     if (T <= 0 && dir < 0) { T = 0; draw(now); dir = 0; running = false; return; }
     draw(now);
     if (dir > 0 && T >= END) setTimeout(function () { requestAnimationFrame(tick); }, 120);   // fully grown: redraw gently
     else requestAnimationFrame(tick);
   }
+  function fade(on) {                         // for people who asked their device for less motion: a soft fade instead of growing
+    [back, front].forEach(function (c) { c.style.transition = 'opacity .4s ease'; c.style.opacity = on ? '1' : '0'; });
+  }
   function kick(d) {
     dir = d;
+    if (reduce) {
+      if (d > 0) { T = END; draw(performance.now()); fade(true); }
+      else { fade(false); setTimeout(function () { if (dir < 0) { T = 0; draw(performance.now()); } }, 450); }
+      return;
+    }
     if (!running) { running = true; last = performance.now(); requestAnimationFrame(tick); }
   }
 
@@ -225,14 +234,11 @@
   function stop() { if (running || T > 0) kick(-1); }
 
   size();
-  if (canHover) {
-    mail.addEventListener('mouseenter', start);
-    mail.addEventListener('mouseleave', stop);
-    mail.addEventListener('focus', start);
-    mail.addEventListener('blur', stop);
-  } else {
-    setTimeout(start, AUTO_DELAY);           // phones: grows by itself shortly after the page opens
-  }
+  if (reduce) { back.style.opacity = '0'; front.style.opacity = '0'; }
+  mail.addEventListener('mouseenter', start);
+  mail.addEventListener('mouseleave', stop);
+  mail.addEventListener('focus', start);
+  mail.addEventListener('blur', stop);
   var rt;
   window.addEventListener('resize', function () {
     clearTimeout(rt);

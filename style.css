@@ -186,3 +186,35 @@ h1,h2{font:inherit;margin:0}
 header>a{white-space:nowrap;font-family:"Fifties Movies","Helvetica Neue",Helvetica,Arial,sans-serif;font-size:1.05rem;letter-spacing:.03em;font-synthesis:none}
 
 .about .small p+p{margin-top:.8rem}
+
+/* ================= Phones ================= */
+@media(max-width:700px){
+  /* Video and Photo: two boxes on top of each other, both visible without scrolling */
+  .split{grid-template-columns:1fr}
+  .split .full{height:50svh;min-height:230px}
+}
+@media(max-width:560px){
+  /* Video, Photo, About and Contact stay on one line */
+  header{gap:.6rem;padding:14px}
+  header>a{font-size:.95rem}
+  .hnav nav[aria-label="Main"]{flex-wrap:nowrap;gap:.3rem .85rem}
+  .nav-contact{padding:0 .65rem}
+}
+@media(max-width:360px){
+  header{padding:12px}
+  .hnav nav[aria-label="Main"]{gap:.3rem .6rem}
+}
+
+/* ================= 360 view: loading animation, then fade in ================= */
+.embed.r360{position:relative;background:#0c0c0d}
+.embed.r360 iframe{opacity:0;transition:opacity .6s ease}
+.embed.r360 iframe.in{opacity:1}
+
+/* ================= About: the picture and the text grow together, smoothly, with the screen ================= */
+.about{grid-template-columns:1fr clamp(150px,24vw,380px)}
+@media(min-width:700px){
+  .about{align-items:center;column-gap:clamp(1rem,4vw,4rem)}
+  .about .small{font-size:clamp(1rem,2.3vw,2.2rem);line-height:1.4;max-width:24em;padding-right:0}
+}
+
+.about .small p{text-wrap:balance}
