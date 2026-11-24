@@ -298,4 +298,34 @@
     window.addEventListener('resize', onScroll);
     update();
   })();
+  /* ---------- "Jump to top": a timed, eased scroll, so you can watch the page glide up ---------- */
+  (function () {
+    var btn = document.querySelector('.bar .mid');
+    if (!btn) return;
+    var reduce = window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches;
+    var raf = 0, restore = null;
+    function stop() {                                  // any scroll of your own cancels the glide
+      if (raf) { cancelAnimationFrame(raf); raf = 0; }
+      if (restore) { restore(); restore = null; }
+    }
+    ['wheel', 'touchstart', 'keydown'].forEach(function (ev) { window.addEventListener(ev, stop, { passive: true }); });
+    btn.addEventListener('click', function (e) {
+      e.preventDefault();
+      var from = window.pageYOffset;
+      if (from <= 0) return;
+      if (reduce) { window.scrollTo(0, 0); return; }
+      stop();
+      var de = document.documentElement, prev = de.style.scrollBehavior;
+      de.style.scrollBehavior = 'auto';                // we drive the scrolling ourselves
+      restore = function () { de.style.scrollBehavior = prev; };
+      var dur = Math.min(1600, Math.max(700, 350 + from * 0.12)), t0 = null;   // longer pages glide a little longer
+      function step(now) {
+        if (t0 === null) t0 = now;
+        var p = Math.min(1, (now - t0) / dur), k = p < 0.5 ? 4 * p * p * p : 1 - Math.pow(-2 * p + 2, 3) / 2;
+        window.scrollTo(0, from * (1 - k));
+        if (p < 1) raf = requestAnimationFrame(step); else { raf = 0; stop(); }
+      }
+      raf = requestAnimationFrame(step);
+    });
+  })();
 })();
