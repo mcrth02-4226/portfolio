@@ -211,10 +211,10 @@ header>a{white-space:nowrap;font-family:"Fifties Movies","Helvetica Neue",Helvet
 .embed.r360 iframe.in{opacity:1}
 
 /* ================= About: the picture and the text grow together, smoothly, with the screen ================= */
-.about{grid-template-columns:1fr clamp(150px,24vw,380px)}
+.about{grid-template-columns:1fr clamp(150px,32vw,560px)}
 @media(min-width:700px){
   .about{align-items:center;column-gap:clamp(1rem,4vw,4rem)}
-  .about .small{font-size:clamp(1rem,2.3vw,2.2rem);line-height:1.4;max-width:24em;padding-right:0}
+  .about .small{font-size:clamp(1rem,2.1vw,2rem);line-height:1.4;max-width:24em;padding-right:0}
 }
 
 .about .small p{text-wrap:balance}
