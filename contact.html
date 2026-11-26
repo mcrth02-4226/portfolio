@@ -21,7 +21,7 @@
 <meta name="theme-color" content="#0b0b0c">
 <link rel="preload" href="fonts/Fifties_Movies.woff" as="font" type="font/woff" crossorigin>
 <link rel="icon" href="images/favicon.webp">
-<link rel="stylesheet" href="style.css?v=15">
+<link rel="stylesheet" href="style.css?v=17">
 <style>
 body{background:#000}
 main{min-height:100svh;display:grid;place-items:center;padding:6rem var(--pad) 4rem}
@@ -47,6 +47,10 @@ main{min-height:100svh;display:grid;place-items:center;padding:6rem var(--pad) 4
 
 /* flower garden (garden.js): one canvas behind the email, one in front */
 .mail,.eyebrow{position:relative;z-index:2}
+/* the label sits under the email and above the flowers, so they can never cover it */
+.credits>*{order:3}
+.mail{order:1}
+.eyebrow{order:2;z-index:4;margin-top:.5rem}
 .garden{position:fixed;left:0;top:0;width:100%;height:100%;pointer-events:none}
 .garden.back{z-index:1}
 .garden.front{z-index:3}
@@ -56,11 +60,11 @@ main{min-height:100svh;display:grid;place-items:center;padding:6rem var(--pad) 4
 .credits>:nth-child(3){animation-delay:.24s}
 .credits>:nth-child(4){animation-delay:.36s}
 .credits>:nth-child(5){animation-delay:.48s}
-@media(prefers-reduced-motion:reduce){.credits>*{animation:none}.mail{transition:none}}
+@media(prefers-reduced-motion:reduce){html:not(.force-motion) .credits>*{animation:none}html:not(.force-motion) .mail{transition:none}}
 </style>
-<script src="site.js?v=12" defer></script>
+<script src="site.js?v=14" defer></script>
 <script src="analytics.js?v=7" defer></script>
-<script src="garden.js?v=2" defer></script>
+<script src="garden.js?v=3" defer></script>
 </head>
 <body>
 <a class="skip" href="#top">Skip to content</a>

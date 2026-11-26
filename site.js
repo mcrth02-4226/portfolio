@@ -17,6 +17,16 @@
   var ALT_FILES = true;            // set to false to stop looking for alt text files
   var ANIMATE_AFTER = 120;         // ms: the focusing animation only shows if a photo takes longer than this
 
+  function forceMotion() {                    // ?motion=on in the address plays every animation even if your device asks for less motion (for testing); ?motion=off undoes it
+    try {
+      var m = /[?&]motion=(on|off)\b/.exec(location.search);
+      if (m) { if (m[1] === 'on') sessionStorage.setItem('ot-motion', 'on'); else sessionStorage.removeItem('ot-motion'); }
+      return sessionStorage.getItem('ot-motion') === 'on';
+    } catch (e) { return /[?&]motion=on\b/.test(location.search); }
+  }
+  var FORCE_MOTION = forceMotion();
+  if (FORCE_MOTION) document.documentElement.classList.add('force-motion');
+
   var root = document.documentElement.getAttribute('data-root') || '';
   var IMG = ['webp', 'jpg', 'jpeg', 'png', 'JPG', 'JPEG'];
   var VID = ['mp4', 'MP4', 'webm', 'mov', 'MOV'];
@@ -302,7 +312,7 @@
   (function () {
     var btn = document.querySelector('.bar .mid');
     if (!btn) return;
-    var reduce = window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches;
+    var reduce = window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches && !FORCE_MOTION;
     var raf = 0, restore = null;
     function stop() {                                  // any scroll of your own cancels the glide
       if (raf) { cancelAnimationFrame(raf); raf = 0; }

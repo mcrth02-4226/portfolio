@@ -19,7 +19,14 @@
   var mail = document.querySelector('.mail');
   if (!mail || !mail.firstChild || mail.firstChild.nodeType !== 3) return;
 
-  var reduce = window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches;
+  function forceMotion() {                    // ?motion=on in the address plays every animation even if your device asks for less motion (for testing); ?motion=off undoes it
+    try {
+      var m = /[?&]motion=(on|off)\b/.exec(location.search);
+      if (m) { if (m[1] === 'on') sessionStorage.setItem('ot-motion', 'on'); else sessionStorage.removeItem('ot-motion'); }
+      return sessionStorage.getItem('ot-motion') === 'on';
+    } catch (e) { return /[?&]motion=on\b/.test(location.search); }
+  }
+  var reduce = window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches && !forceMotion();
   var canHover = window.matchMedia && matchMedia('(hover: hover) and (pointer: fine)').matches;
   if (!canHover) return;                      // phones and tablets: no flowers
 

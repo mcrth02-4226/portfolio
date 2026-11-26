@@ -42,7 +42,7 @@ img{max-width:100%}
 .small{padding:0 var(--pad);max-width:46ch;color:var(--muted)}
 footer{display:flex;justify-content:space-between;flex-wrap:wrap;gap:1rem;padding:3rem var(--pad) var(--pad);color:var(--muted)}
 footer div{display:flex;gap:1.25rem;flex-wrap:wrap}
-@media(prefers-reduced-motion:reduce){html{scroll-behavior:auto}}
+@media(prefers-reduced-motion:reduce){html:not(.force-motion){scroll-behavior:auto}}
 
 /* 360 embed */
 .r360{height:70svh;min-height:360px}
@@ -113,9 +113,9 @@ img.reveal.in{opacity:1}
 .msg{position:absolute;left:0;right:0;bottom:.8rem;text-align:center;color:var(--text);z-index:2}
 
 @media(prefers-reduced-motion:reduce){
-  .is-loading::before{animation:none;opacity:0}
-  .is-loading::after{animation:none;opacity:.6}
-  img.reveal{transition:none;filter:none}
+  html:not(.force-motion) .is-loading::before{animation:none;opacity:0}
+  html:not(.force-motion) .is-loading::after{animation:none;opacity:.6}
+  html:not(.force-motion) img.reveal{transition:none;filter:none}
 }
 
 /* Contact button in every header; header links wrap instead of overflowing on small screens */
@@ -148,7 +148,7 @@ header a::before{content:"";position:absolute;inset:-9px -6px}  /* bigger tap ar
   .tile:hover::after{opacity:1}
   .tile:hover .cap,.tile:hover .go,.tile:hover .play{opacity:0}
 }
-@media(prefers-reduced-motion:reduce){.tile::after,.tile .cap,.tile .go,.tile .play{transition:none}}
+@media(prefers-reduced-motion:reduce){html:not(.force-motion) .tile::after,html:not(.force-motion) .tile .cap,html:not(.force-motion) .tile .go,html:not(.force-motion) .tile .play{transition:none}}
 
 /* ================= Bottom of the Video and Photo pages ================= */
 footer.pagefoot{display:block;padding:3rem var(--pad) var(--pad)}
@@ -169,7 +169,7 @@ footer.pagefoot{display:block;padding:3rem var(--pad) var(--pad)}
 @media(min-width:700px){
   .hnav nav.sections{position:fixed;right:var(--pad);top:50%;transform:translateY(-50%);gap:.8rem}
 }
-@media(prefers-reduced-motion:reduce){.hnav nav.sections a{transition:none}}
+@media(prefers-reduced-motion:reduce){html:not(.force-motion) .hnav nav.sections a{transition:none}}
 
 /* File names stay hidden while images are being looked up and loaded.
    A name only appears for a box whose file has not been uploaded yet. */
@@ -218,3 +218,6 @@ header>a{white-space:nowrap;font-family:"Fifties Movies","Helvetica Neue",Helvet
 }
 
 .about .small p{text-wrap:balance}
+
+/* the home page tiles never show a file name, even before their picture is uploaded */
+.split .ph.missing{color:transparent}
